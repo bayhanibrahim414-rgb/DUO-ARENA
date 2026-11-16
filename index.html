@@ -1,0 +1,3191 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>DUO ARENA - 2 Kişilik Çoklu Dokunmatik &amp; Joystick Arena</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-dark: #07090f;
+      --card-bg: #0f172a;
+      --p1-cyan: #00f0ff;
+      --p2-pink: #ff2a85;
+      --gold: #ffbe0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100dvh;
+      background-color: #07090f;
+      color: #f8fafc;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      overscroll-behavior-y: none;
+    }
+
+    /* Viewport lock strictly applied ONLY during active gameplay */
+    body.in-game {
+      height: 100dvh;
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .font-display {
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    /* Main Menu Background */
+    .arena-bg {
+      background-color: #07090f;
+      background-image:
+        radial-gradient(circle at 18% 12%, rgba(0, 240, 255, 0.13) 0%, transparent 45%),
+        radial-gradient(circle at 82% 88%, rgba(255, 42, 133, 0.13) 0%, transparent 45%),
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
+    }
+
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.86);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+    }
+
+    /* Custom Range Slider */
+    input[type="range"].neon-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      outline: none;
+    }
+    input[type="range"].neon-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #00f0ff;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.85);
+      cursor: pointer;
+      border: 2px solid #07090f;
+    }
+    input[type="range"].neon-slider::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #00f0ff;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.85);
+      cursor: pointer;
+      border: 2px solid #07090f;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.012); }
+    }
+    .start-btn-pulse {
+      animation: pulseGlow 2.4s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="arena-bg text-slate-100 antialiased">
+
+  <!-- ==================== MAIN MENU VIEW ==================== -->
+  <main id="menuView" class="w-full max-w-xl mx-auto px-4 pt-5 pb-10 flex flex-col gap-5">
+
+    <!-- 1. HEADER -->
+    <header class="text-center pt-1">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0f172a]/90 border border-white/10 text-[11px] font-semibold tracking-wider uppercase text-slate-300 mb-2.5">
+        <span class="w-2 h-2 rounded-full bg-[#00f0ff] shadow-[0_0_8px_#00f0ff]"></span>
+        <span>1. Oyuncu • 2. Oyuncu</span>
+        <span class="w-2 h-2 rounded-full bg-[#ff2a85] shadow-[0_0_8px_#ff2a85]"></span>
+      </div>
+      <h1 class="font-display text-4xl sm:text-5xl font-black tracking-wider bg-gradient-to-r from-[#00f0ff] via-white to-[#ff2a85] bg-clip-text text-transparent drop-shadow-[0_2px_18px_rgba(0,240,255,0.28)]">
+        DUO ARENA
+      </h1>
+      <p class="text-slate-400 text-xs sm:text-sm font-medium mt-1.5">
+        2 Kişilik Çoklu Dokunmatik &amp; Joystick Arena
+      </p>
+    </header>
+
+    <!-- 2. OYUN SEÇ (GAME SELECTOR) -->
+    <section aria-label="Oyun Seç" class="flex flex-col gap-2.5">
+      <div class="flex items-center justify-between px-1">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400">Oyun Seç</h2>
+        <span class="text-[11px] font-medium text-slate-400">5 Oyun Mevcut</span>
+      </div>
+
+      <div id="gameCardsContainer" class="grid grid-cols-1 gap-2.5">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
+
+    <!-- 3. BAŞLA BUTTON -->
+    <section aria-label="Oyunu Başlat" class="pt-0.5">
+      <button id="startBtn" type="button"
+        class="start-btn-pulse w-full py-4 px-6 rounded-2xl font-display font-black text-lg sm:text-xl tracking-wider text-slate-950 shadow-xl transition-transform active:scale-95 flex flex-col items-center justify-center gap-0.5 cursor-pointer"
+        style="background: linear-gradient(135deg, #00f0ff, #38bdf8); box-shadow: 0 10px 30px -5px rgba(0, 240, 255, 0.48);">
+        <span>BAŞLA</span>
+        <span id="startBtnSubtitle" class="font-sans text-[11px] font-bold tracking-normal text-slate-950/85">
+          Kaotik Neon Hava Hokeyi
+        </span>
+      </button>
+    </section>
+
+    <!-- 4. AYARLAR (SETTINGS PANEL) -->
+    <section aria-label="Ayarlar" class="glass-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-5 shadow-2xl">
+
+      <!-- Top Section: General Ses Ayarları -->
+      <div class="flex flex-col gap-3.5">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/30 flex items-center justify-center text-[#00f0ff]">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-white tracking-wide">Ses Ayarları</h3>
+              <p class="text-[11px] text-slate-400">Sentezlenmiş Oyun Ses Efektleri</p>
+            </div>
+          </div>
+
+          <!-- Sound Effects On/Off Toggle -->
+          <div class="inline-flex rounded-xl bg-slate-950/90 p-1 border border-white/10">
+            <button type="button" id="soundOnBtn" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer">
+              Açık
+            </button>
+            <button type="button" id="soundOffBtn" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer">
+              Kapalı
+            </button>
+          </div>
+        </div>
+
+        <!-- Volume Slider 0-100% -->
+        <div id="volumeRow" class="flex items-center gap-3 pt-0.5">
+          <span class="text-xs font-medium text-slate-400 shrink-0">Ses Seviyesi</span>
+          <input id="volumeSlider" type="range" min="0" max="100" value="75" class="neon-slider flex-1" aria-label="Ses Seviyesi" />
+          <span id="volumeValue" class="text-xs font-bold text-[#00f0ff] w-10 text-right tabular-nums">%75</span>
+        </div>
+      </div>
+
+      <hr class="border-white/10" />
+
+      <!-- Bottom Section: Context-Sensitive Game Settings -->
+      <div class="flex flex-col gap-3.5">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-[#ffbe0b] block">Seçili Oyun Ayarları</span>
+            <h3 id="contextSettingsTitle" class="text-sm font-bold text-white tracking-wide mt-0.5">
+              Kaotik Neon Hava Hokeyi Ayarları
+            </h3>
+          </div>
+          <span id="contextSettingsBadge" class="w-3 h-3 rounded-full shrink-0" style="background:#00f0ff; box-shadow: 0 0 10px #00f0ff;"></span>
+        </div>
+
+        <div id="contextSettingsContainer" class="flex flex-col gap-3">
+          <!-- Dynamically populated ONLY for the active selected game -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Player Orientation Legend -->
+    <footer class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#0f172a]/70 border border-white/5 text-xs text-slate-400">
+      <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-[#00f0ff] shadow-[0_0_8px_#00f0ff]"></span>
+        <span><strong class="text-slate-200">Alt Taraf:</strong> 1. Oyuncu</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span><strong class="text-slate-200">Üst Taraf:</strong> 2. Oyuncu</span>
+        <span class="w-3 h-3 rounded-full bg-[#ff2a85] shadow-[0_0_8px_#ff2a85]"></span>
+      </div>
+    </footer>
+  </main>
+
+  <!-- ==================== FULLSCREEN GAME VIEW ==================== -->
+  <div id="gameView" class="fixed inset-0 z-50 hidden flex-col bg-[#07090f]" style="touch-action: none; user-select: none;">
+    <canvas id="gameCanvas" class="block w-full h-full flex-1" style="touch-action: none;"></canvas>
+
+    <!-- Subtle In-Game Menu Return Button (Center-Left Edge so it never blocks goals or joysticks) -->
+    <button id="inGameMenuBtn" type="button"
+      class="fixed left-2.5 top-1/2 -translate-y-1/2 z-30 px-3 py-2.5 rounded-xl bg-[#0f172a]/85 hover:bg-[#0f172a] border border-white/15 text-[11px] font-bold tracking-wider uppercase text-slate-200 backdrop-blur-md shadow-lg active:scale-95 transition-transform cursor-pointer">
+      Menü
+    </button>
+
+    <!-- Round / Match Result Overlay Modal -->
+    <div id="resultModal" class="fixed inset-0 z-40 hidden items-center justify-center p-4 bg-[#07090f]/80 backdrop-blur-md">
+      <div class="glass-panel rounded-3xl p-6 w-full max-w-sm text-center flex flex-col gap-5 shadow-2xl border border-white/15">
+        <!-- Mirrored Result Banner for Top Player (P2) -->
+        <div class="rotate-180 border-b border-white/10 pb-3">
+          <span class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Maç Sonucu</span>
+          <h3 id="modalTitleP2" class="font-display text-xl font-black text-[#ff2a85] mt-0.5">2. OYUNCU KAZANDI!</h3>
+        </div>
+
+        <!-- Upright Result Banner for Bottom Player (P1) -->
+        <div>
+          <span class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Maç Sonucu</span>
+          <h2 id="modalTitleP1" class="font-display text-2xl font-black text-white mt-1">1. OYUNCU KAZANDI!</h2>
+          <p id="modalScoreSummary" class="text-sm text-slate-300 mt-1.5 font-medium">Skor: 5 - 3</p>
+        </div>
+
+        <div class="flex flex-col gap-2.5 pt-1">
+          <button id="replayBtn" type="button"
+            class="w-full py-3.5 px-5 rounded-2xl font-bold text-sm bg-[#00f0ff] text-slate-950 shadow-[0_0_20px_rgba(0,240,255,0.4)] active:scale-95 transition-transform cursor-pointer">
+            Tekrar Oyna
+          </button>
+          <button id="backToMenuBtn" type="button"
+            class="w-full py-3.5 px-5 rounded-2xl font-bold text-sm bg-white/10 hover:bg-white/15 text-white border border-white/10 active:scale-95 transition-transform cursor-pointer">
+            Ana Menü
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* =========================================================================
+       * SAFE MATH HELPERS (Prevent DOMException on Canvas arc / radialGradient)
+       * ========================================================================= */
+      function safeR(r) {
+        return Number.isFinite(r) && r > 0.1 ? r : 0.1;
+      }
+
+      function clamp(val, min, max) {
+        return Math.max(min, Math.min(max, val));
+      }
+
+      /* =========================================================================
+       * 1. DEFENSIVE WEB AUDIO SYNTHESIZER (iOS Safari Safe)
+       * ========================================================================= */
+      class SoundEngine {
+        constructor() {
+          this.enabled = true;
+          this.volume = 0.75;
+          this.ctx = null;
+        }
+
+        unlock() {
+          try {
+            if (!this.ctx) {
+              const AudioCtx = window.AudioContext || window.webkitAudioContext;
+              if (AudioCtx) {
+                this.ctx = new AudioCtx();
+              }
+            }
+            if (this.ctx && this.ctx.state === 'suspended') {
+              this.ctx.resume().catch(() => {});
+            }
+          } catch (err) {
+            // Silently ignore audio lock issues on restricted browsers
+          }
+        }
+
+        playTone(freqStart, freqEnd, duration, type = 'sine', gainMult = 0.25, delay = 0) {
+          if (!this.enabled || this.volume <= 0.01) return;
+          try {
+            this.unlock();
+            if (!this.ctx) return;
+
+            const now = this.ctx.currentTime + delay;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = type;
+            osc.frequency.setValueAtTime(Math.max(20, freqStart), now);
+            if (freqEnd && freqEnd !== freqStart) {
+              osc.frequency.exponentialRampToValueAtTime(Math.max(20, freqEnd), now + duration);
+            }
+
+            const peak = Math.max(0.001, this.volume * gainMult);
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.linearRampToValueAtTime(peak, now + 0.012);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + duration + 0.02);
+          } catch (err) {
+            // Defensive guard
+          }
+        }
+
+        playSelect() {
+          this.playTone(540, 820, 0.08, 'sine', 0.18);
+        }
+
+        playHit(intensity = 0.8) {
+          const base = 190 + clamp(intensity, 0.2, 1.5) * 180;
+          this.playTone(base, base * 0.55, 0.1, 'triangle', 0.26);
+        }
+
+        playWall() {
+          this.playTone(150, 95, 0.07, 'sine', 0.16);
+        }
+
+        playPowerup() {
+          this.playTone(460, 690, 0.09, 'sine', 0.24, 0);
+          this.playTone(690, 1020, 0.13, 'triangle', 0.24, 0.07);
+        }
+
+        playDash() {
+          this.playTone(240, 760, 0.16, 'sawtooth', 0.22, 0);
+        }
+
+        playScore(isP1 = true) {
+          const root = isP1 ? 523.25 : 440;
+          this.playTone(root, root * 1.25, 0.12, 'triangle', 0.28, 0);
+          this.playTone(root * 1.25, root * 1.5, 0.16, 'triangle', 0.28, 0.09);
+          this.playTone(root * 1.5, root * 2, 0.24, 'sine', 0.3, 0.18);
+        }
+
+        playExplosion() {
+          this.playTone(140, 38, 0.28, 'sawtooth', 0.3);
+        }
+
+        playCountdown(isGo = false) {
+          if (isGo) {
+            this.playTone(660, 990, 0.24, 'triangle', 0.28);
+          } else {
+            this.playTone(440, 440, 0.11, 'sine', 0.2);
+          }
+        }
+      }
+
+      const sound = new SoundEngine();
+
+      /* =========================================================================
+       * 2. GAMES CATALOG & CONTEXT-SENSITIVE SETTINGS DEFINITIONS
+       * ========================================================================= */
+      const GAMES_CATALOG = [
+        {
+          id: 'airhockey',
+          title: 'Kaotik Neon Hava Hokeyi',
+          desc: 'Hızlı dokunuşlarla diske falso ver, sürpriz güçlendirmeleri kap',
+          controlType: 'Dokunmatik',
+          accent: '#00f0ff',
+          gradient: 'linear-gradient(135deg, #00f0ff, #38bdf8)',
+          iconSvg: `<svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9" />
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 3v3M12 18v3" />
+          </svg>`,
+          settingsSchema: [
+            {
+              key: 'winScore',
+              label: 'Hedef Skor',
+              options: [
+                { value: 3, label: '3' },
+                { value: 5, label: '5' },
+                { value: 7, label: '7' }
+              ]
+            },
+            {
+              key: 'powerups',
+              label: 'Güçlendirmeler',
+              options: [
+                { value: true, label: 'Açık' },
+                { value: false, label: 'Kapalı' }
+              ]
+            },
+            {
+              key: 'puckSpeed',
+              label: 'Disk Hızı',
+              options: [
+                { value: 'normal', label: 'Normal' },
+                { value: 'fast', label: 'Hızlı' },
+                { value: 'chaos', label: 'Kaos' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'sumo',
+          title: 'Parmak Sumosu',
+          desc: 'Joystick ile yön ver, küreleri topla ve ŞOK dalgasıyla rakibi dışarı at',
+          controlType: 'Joystick',
+          accent: '#ffbe0b',
+          gradient: 'linear-gradient(135deg, #ffbe0b, #f59e0b)',
+          iconSvg: `<svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9.5" stroke-dasharray="4 2" />
+            <circle cx="9.2" cy="12" r="3.2" />
+            <circle cx="15.2" cy="12" r="2.6" />
+          </svg>`,
+          settingsSchema: [
+            {
+              key: 'joystickType',
+              label: 'Joystick Tipi',
+              options: [
+                { value: 'fixed', label: 'Sabit Köşe' },
+                { value: 'dynamic', label: 'Dinamik Dokunma' }
+              ]
+            },
+            {
+              key: 'winScore',
+              label: 'Hedef Skor',
+              options: [
+                { value: 3, label: '3' },
+                { value: 5, label: '5' },
+                { value: 7, label: '7' }
+              ]
+            },
+            {
+              key: 'shrinkSpeed',
+              label: 'Arena Daralma Hızı',
+              options: [
+                { value: 'slow', label: 'Yavaş' },
+                { value: 'normal', label: 'Normal' },
+                { value: 'fast', label: 'Hızlı' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'tron',
+          title: 'Serbest Çizgi Düellosu',
+          desc: 'Joystick ile 360° manevra yap, neon izinle rakibinin önünü kes',
+          controlType: 'Joystick',
+          accent: '#00ff88',
+          gradient: 'linear-gradient(135deg, #00ff88, #34d399)',
+          iconSvg: `<svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 18c3-8 7-11 11-6s3 6 5 2" />
+            <circle cx="20" cy="14" r="2" fill="currentColor" />
+          </svg>`,
+          settingsSchema: [
+            {
+              key: 'joystickType',
+              label: 'Joystick Tipi',
+              options: [
+                { value: 'fixed', label: 'Sabit Köşe' },
+                { value: 'dynamic', label: 'Dinamik Dokunma' }
+              ]
+            },
+            {
+              key: 'trailLength',
+              label: 'İz Uzunluğu',
+              options: [
+                { value: 'short', label: 'Kısa' },
+                { value: 'medium', label: 'Orta' },
+                { value: 'long', label: 'Uzun' }
+              ]
+            },
+            {
+              key: 'moveSpeed',
+              label: 'Hız',
+              options: [
+                { value: 'normal', label: 'Normal' },
+                { value: 'fast', label: 'Hızlı' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'pong',
+          title: 'Falsolu Plazma Tenisi',
+          desc: 'Kalkanını 2D kaydır, vuruş anında yana çekerek topa kavis ver',
+          controlType: 'Dokunmatik',
+          accent: '#b829ff',
+          gradient: 'linear-gradient(135deg, #b829ff, #e879f9)',
+          iconSvg: `<svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 4h14M5 20h14" stroke-width="2.5" />
+            <path d="M9 17c5-3 5-7 0-10" stroke-dasharray="3 2" />
+            <circle cx="14" cy="12" r="2.2" fill="currentColor" />
+          </svg>`,
+          settingsSchema: [
+            {
+              key: 'winScore',
+              label: 'Hedef Skor',
+              options: [
+                { value: 3, label: '3' },
+                { value: 5, label: '5' },
+                { value: 7, label: '7' }
+              ]
+            },
+            {
+              key: 'spinPower',
+              label: 'Falso Gücü',
+              options: [
+                { value: 'normal', label: 'Normal' },
+                { value: 'high', label: 'Yüksek' }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'paint',
+          title: 'Boya Savaşı',
+          desc: 'Süre dolmadan parmağını kaydır ve bombalarla en çok alanı boya',
+          controlType: 'Dokunmatik',
+          accent: '#ff2a85',
+          gradient: 'linear-gradient(135deg, #ff2a85, #fb7185)',
+          iconSvg: `<svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3c4.5 5 7 8 7 11a7 7 0 1 1-14 0c0-3 2.5-6 7-11z" />
+            <circle cx="10" cy="14" r="1.5" fill="currentColor" />
+          </svg>`,
+          settingsSchema: [
+            {
+              key: 'duration',
+              label: 'Tur Süresi',
+              options: [
+                { value: 20, label: '20 sn' },
+                { value: 30, label: '30 sn' },
+                { value: 45, label: '45 sn' }
+              ]
+            },
+            {
+              key: 'brushSize',
+              label: 'Fırça Boyutu',
+              options: [
+                { value: 'normal', label: 'Normal' },
+                { value: 'large', label: 'Büyük' }
+              ]
+            }
+          ]
+        }
+      ];
+
+      const userGameSettings = {
+        airhockey: { winScore: 5, powerups: true, puckSpeed: 'normal' },
+        sumo: { joystickType: 'fixed', winScore: 5, shrinkSpeed: 'normal' },
+        tron: { joystickType: 'fixed', trailLength: 'medium', moveSpeed: 'normal' },
+        pong: { winScore: 5, spinPower: 'normal' },
+        paint: { duration: 30, brushSize: 'normal' }
+      };
+
+      let selectedGameId = 'airhockey';
+
+      /* =========================================================================
+       * 3. MULTI-TOUCH DIRECT DRAG CONTROLLER (Air Hockey, Spin Pong, Paint War)
+       * ========================================================================= */
+      class DirectTouchController {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.enabled = false;
+          this.fullArenaMode = false; // True for Boya Savaşı so players can roam full screen
+
+          this.p1 = { id: null, x: 0, y: 0, prevX: 0, prevY: 0, vx: 0, vy: 0, active: false };
+          this.p2 = { id: null, x: 0, y: 0, prevX: 0, prevY: 0, vx: 0, vy: 0, active: false };
+          this.mouseActive = false;
+          this.mousePlayer = null;
+
+          this.bindEvents();
+        }
+
+        configure(enabled, fullArenaMode, w, h) {
+          this.enabled = enabled;
+          this.fullArenaMode = fullArenaMode;
+          this.reset(w, h);
+        }
+
+        reset(w, h) {
+          this.p1 = { id: null, x: w * 0.5, y: h * 0.78, prevX: w * 0.5, prevY: h * 0.78, vx: 0, vy: 0, active: false };
+          this.p2 = { id: null, x: w * 0.5, y: h * 0.22, prevX: w * 0.5, prevY: h * 0.22, vx: 0, vy: 0, active: false };
+          this.mouseActive = false;
+          this.mousePlayer = null;
+        }
+
+        getLocalCoords(clientX, clientY) {
+          const rect = this.canvas.getBoundingClientRect();
+          const w = rect.width || window.innerWidth || 360;
+          const h = rect.height || window.innerHeight || 640;
+          return {
+            x: clamp(clientX - rect.left, 0, w),
+            y: clamp(clientY - rect.top, 0, h),
+            w,
+            h
+          };
+        }
+
+        assignTouch(id, x, y, w, h) {
+          if (this.fullArenaMode) {
+            // Assign to whichever player is unassigned or closest to touch
+            const d1 = Math.hypot(x - this.p1.x, y - this.p1.y);
+            const d2 = Math.hypot(x - this.p2.x, y - this.p2.y);
+            if (!this.p1.active && (d1 <= d2 || this.p2.active)) {
+              this.p1.id = id;
+              this.p1.active = true;
+              this.p1.x = this.p1.prevX = x;
+              this.p1.y = this.p1.prevY = y;
+            } else if (!this.p2.active) {
+              this.p2.id = id;
+              this.p2.active = true;
+              this.p2.x = this.p2.prevX = x;
+              this.p2.y = this.p2.prevY = y;
+            }
+          } else {
+            // Half-screen strict split: Bottom = P1, Top = P2
+            if (y >= h * 0.5) {
+              if (!this.p1.active) {
+                this.p1.id = id;
+                this.p1.active = true;
+                this.p1.x = this.p1.prevX = x;
+                this.p1.y = this.p1.prevY = y;
+              }
+            } else {
+              if (!this.p2.active) {
+                this.p2.id = id;
+                this.p2.active = true;
+                this.p2.x = this.p2.prevX = x;
+                this.p2.y = this.p2.prevY = y;
+              }
+            }
+          }
+        }
+
+        moveTouch(id, x, y) {
+          if (this.p1.active && this.p1.id === id) {
+            this.p1.x = x;
+            this.p1.y = y;
+          } else if (this.p2.active && this.p2.id === id) {
+            this.p2.x = x;
+            this.p2.y = y;
+          }
+        }
+
+        releaseTouch(id) {
+          if (this.p1.id === id) {
+            this.p1.id = null;
+            this.p1.active = false;
+          }
+          if (this.p2.id === id) {
+            this.p2.id = null;
+            this.p2.active = false;
+          }
+        }
+
+        bindEvents() {
+          this.canvas.addEventListener('touchstart', (e) => {
+            if (!this.enabled) return;
+            e.preventDefault();
+            sound.unlock();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+              const t = e.changedTouches[i];
+              const p = this.getLocalCoords(t.clientX, t.clientY);
+              this.assignTouch(t.identifier, p.x, p.y, p.w, p.h);
+            }
+          }, { passive: false });
+
+          this.canvas.addEventListener('touchmove', (e) => {
+            if (!this.enabled) return;
+            e.preventDefault();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+              const t = e.changedTouches[i];
+              const p = this.getLocalCoords(t.clientX, t.clientY);
+              this.moveTouch(t.identifier, p.x, p.y);
+            }
+          }, { passive: false });
+
+          const onEnd = (e) => {
+            if (!this.enabled) return;
+            e.preventDefault();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+              this.releaseTouch(e.changedTouches[i].identifier);
+            }
+          };
+          this.canvas.addEventListener('touchend', onEnd, { passive: false });
+          this.canvas.addEventListener('touchcancel', onEnd, { passive: false });
+
+          // Desktop Mouse Fallback
+          this.canvas.addEventListener('mousedown', (e) => {
+            if (!this.enabled) return;
+            sound.unlock();
+            const p = this.getLocalCoords(e.clientX, e.clientY);
+            this.mouseActive = true;
+            this.mousePlayer = p.y >= p.h * 0.5 ? 'p1' : 'p2';
+            const target = this[this.mousePlayer];
+            target.active = true;
+            target.x = target.prevX = p.x;
+            target.y = target.prevY = p.y;
+          });
+
+          window.addEventListener('mousemove', (e) => {
+            if (!this.enabled || !this.mouseActive || !this.mousePlayer) return;
+            const p = this.getLocalCoords(e.clientX, e.clientY);
+            const target = this[this.mousePlayer];
+            target.x = p.x;
+            target.y = p.y;
+          });
+
+          window.addEventListener('mouseup', () => {
+            if (this.mouseActive && this.mousePlayer) {
+              this[this.mousePlayer].active = false;
+              this.mouseActive = false;
+              this.mousePlayer = null;
+            }
+          });
+        }
+
+        step(dt) {
+          if (!this.enabled) return;
+          const invDt = dt > 0.0001 ? 1 / dt : 60;
+
+          this.p1.vx = (this.p1.x - this.p1.prevX) * invDt;
+          this.p1.vy = (this.p1.y - this.p1.prevY) * invDt;
+          this.p1.prevX = this.p1.x;
+          this.p1.prevY = this.p1.y;
+
+          this.p2.vx = (this.p2.x - this.p2.prevX) * invDt;
+          this.p2.vy = (this.p2.y - this.p2.prevY) * invDt;
+          this.p2.prevX = this.p2.x;
+          this.p2.prevY = this.p2.y;
+        }
+      }
+
+      /* =========================================================================
+       * 4. VIRTUAL JOYSTICK + ŞOK CONTROLLER (Parmak Sumosu & Serbest Çizgi Düellosu)
+       * ========================================================================= */
+      class VirtualJoystickController {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.enabled = false;
+          this.mode = 'fixed'; // 'fixed' | 'dynamic'
+          this.hasShockBtn = false;
+          this.onShockTrigger = null;
+
+          this.baseRadius = 54;
+          this.knobRadius = 23;
+          this.shockRadius = 35;
+
+          this.p1 = this.createStickState('#00f0ff');
+          this.p2 = this.createStickState('#ff2a85');
+
+          this.keys = {};
+          this.mouseStick = null;
+          this.bindEvents();
+        }
+
+        createStickState(color) {
+          return {
+            id: null,
+            active: false,
+            baseX: 0, baseY: 0,
+            defaultX: 0, defaultY: 0,
+            knobX: 0, knobY: 0,
+            nx: 0, ny: 0, magnitude: 0,
+            color,
+            shockBtn: { x: 0, y: 0, cooldown: 0, maxCooldown: 2.5, flash: 0 }
+          };
+        }
+
+        configure(enabled, mode, hasShockBtn, w, h, onShockTrigger) {
+          this.enabled = enabled;
+          this.mode = mode || 'fixed';
+          this.hasShockBtn = hasShockBtn;
+          this.onShockTrigger = onShockTrigger;
+          this.layout(w, h);
+          this.reset();
+        }
+
+        layout(w, h) {
+          const safeW = Math.max(280, w);
+          const safeH = Math.max(400, h);
+          const padX = clamp(safeW * 0.18, 74, 106);
+          const padY = clamp(safeH * 0.13, 80, 118);
+
+          // P1 (Bottom): Joystick bottom-left, ŞOK bottom-right
+          this.p1.defaultX = padX;
+          this.p1.defaultY = safeH - padY;
+          this.p1.shockBtn.x = safeW - padX;
+          this.p1.shockBtn.y = safeH - padY;
+
+          // P2 (Top): Joystick top-right, ŞOK top-left (face-to-face mirror)
+          this.p2.defaultX = safeW - padX;
+          this.p2.defaultY = padY;
+          this.p2.shockBtn.x = padX;
+          this.p2.shockBtn.y = padY;
+
+          if (!this.p1.active) {
+            this.p1.baseX = this.p1.knobX = this.p1.defaultX;
+            this.p1.baseY = this.p1.knobY = this.p1.defaultY;
+          }
+          if (!this.p2.active) {
+            this.p2.baseX = this.p2.knobX = this.p2.defaultX;
+            this.p2.baseY = this.p2.knobY = this.p2.defaultY;
+          }
+        }
+
+        reset() {
+          for (const s of [this.p1, this.p2]) {
+            s.id = null;
+            s.active = false;
+            s.baseX = s.knobX = s.defaultX;
+            s.baseY = s.knobY = s.defaultY;
+            s.nx = 0;
+            s.ny = 0;
+            s.magnitude = 0;
+            s.shockBtn.cooldown = 0;
+            s.shockBtn.flash = 0;
+          }
+        }
+
+        getLocalCoords(clientX, clientY) {
+          const rect = this.canvas.getBoundingClientRect();
+          const w = rect.width || window.innerWidth || 360;
+          const h = rect.height || window.innerHeight || 640;
+          return {
+            x: clientX - rect.left,
+            y: clientY - rect.top,
+            w,
+            h
+          };
+        }
+
+        handleDown(id, x, y, w, h) {
+          if (!this.enabled) return;
+          const isBottom = y >= h * 0.5;
+          const player = isBottom ? this.p1 : this.p2;
+          const playerNum = isBottom ? 1 : 2;
+
+          // 1. Check ŞOK button first (works simultaneously with joystick finger!)
+          if (this.hasShockBtn) {
+            const dShock = Math.hypot(x - player.shockBtn.x, y - player.shockBtn.y);
+            if (dShock <= this.shockRadius + 24) {
+              if (player.shockBtn.cooldown <= 0 && this.onShockTrigger) {
+                player.shockBtn.cooldown = player.shockBtn.maxCooldown;
+                player.shockBtn.flash = 0.25;
+                this.onShockTrigger(playerNum);
+              }
+              return;
+            }
+          }
+
+          // 2. Otherwise bind finger to this player's Virtual Joystick
+          if (!player.active) {
+            player.active = true;
+            player.id = id;
+
+            if (this.mode === 'dynamic') {
+              player.baseX = clamp(x, this.baseRadius + 14, w - this.baseRadius - 14);
+              player.baseY = isBottom
+                ? clamp(y, h * 0.5 + this.baseRadius + 8, h - this.baseRadius - 14)
+                : clamp(y, this.baseRadius + 14, h * 0.5 - this.baseRadius - 8);
+            } else {
+              player.baseX = player.defaultX;
+              player.baseY = player.defaultY;
+            }
+            this.updateKnob(player, x, y);
+          }
+        }
+
+        handleMove(id, x, y) {
+          if (!this.enabled) return;
+          if (this.p1.active && this.p1.id === id) {
+            this.updateKnob(this.p1, x, y);
+          } else if (this.p2.active && this.p2.id === id) {
+            this.updateKnob(this.p2, x, y);
+          }
+        }
+
+        handleUp(id) {
+          if (this.p1.id === id) this.releaseStick(this.p1);
+          if (this.p2.id === id) this.releaseStick(this.p2);
+        }
+
+        updateKnob(stick, tx, ty) {
+          const dx = tx - stick.baseX;
+          const dy = ty - stick.baseY;
+          const dist = Math.hypot(dx, dy);
+          const clamped = Math.min(this.baseRadius, dist);
+
+          if (dist > 0.001) {
+            const ux = dx / dist;
+            const uy = dy / dist;
+            stick.knobX = stick.baseX + ux * clamped;
+            stick.knobY = stick.baseY + uy * clamped;
+            stick.nx = ux;
+            stick.ny = uy;
+            stick.magnitude = clamped / this.baseRadius;
+          } else {
+            stick.knobX = stick.baseX;
+            stick.knobY = stick.baseY;
+            stick.nx = 0;
+            stick.ny = 0;
+            stick.magnitude = 0;
+          }
+        }
+
+        releaseStick(stick) {
+          stick.active = false;
+          stick.id = null;
+          stick.baseX = stick.knobX = stick.defaultX;
+          stick.baseY = stick.knobY = stick.defaultY;
+          stick.nx = 0;
+          stick.ny = 0;
+          stick.magnitude = 0;
+        }
+
+        bindEvents() {
+          this.canvas.addEventListener('touchstart', (e) => {
+            if (!this.enabled) return;
+            e.preventDefault();
+            sound.unlock();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+              const t = e.changedTouches[i];
+              const p = this.getLocalCoords(t.clientX, t.clientY);
+              this.handleDown(t.identifier, p.x, p.y, p.w, p.h);
+            }
+          }, { passive: false });
+
+          this.canvas.addEventListener('touchmove', (e) => {
+            if (!this.enabled) return;
+            e.preventDefault();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+              const t = e.changedTouches[i];
+              const p = this.getLocalCoords(t.clientX, t.clientY);
+              this.handleMove(t.identifier, p.x, p.y);
+            }
+          }, { passive: false });
+
+          const onEnd = (e) => {
+            if (!this.enabled) return;
+            e.preventDefault();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+              this.handleUp(e.changedTouches[i].identifier);
+            }
+          };
+          this.canvas.addEventListener('touchend', onEnd, { passive: false });
+          this.canvas.addEventListener('touchcancel', onEnd, { passive: false });
+
+          // Desktop Mouse Fallback
+          this.canvas.addEventListener('mousedown', (e) => {
+            if (!this.enabled) return;
+            sound.unlock();
+            const p = this.getLocalCoords(e.clientX, e.clientY);
+            this.mouseStick = 'mouse';
+            this.handleDown('mouse', p.x, p.y, p.w, p.h);
+          });
+          window.addEventListener('mousemove', (e) => {
+            if (!this.enabled || !this.mouseStick) return;
+            const p = this.getLocalCoords(e.clientX, e.clientY);
+            this.handleMove('mouse', p.x, p.y);
+          });
+          window.addEventListener('mouseup', () => {
+            if (this.mouseStick) {
+              this.handleUp('mouse');
+              this.mouseStick = null;
+            }
+          });
+
+          // Desktop Keyboard Fallback (WASD + Space for P1, Arrows + Enter for P2)
+          window.addEventListener('keydown', (e) => {
+            if (!this.enabled) return;
+            this.keys[e.code] = true;
+            if (this.hasShockBtn) {
+              if ((e.code === 'Space' || e.code === 'ShiftLeft') && this.p1.shockBtn.cooldown <= 0 && this.onShockTrigger) {
+                this.p1.shockBtn.cooldown = this.p1.shockBtn.maxCooldown;
+                this.p1.shockBtn.flash = 0.25;
+                this.onShockTrigger(1);
+              }
+              if ((e.code === 'Enter' || e.code === 'ShiftRight') && this.p2.shockBtn.cooldown <= 0 && this.onShockTrigger) {
+                this.p2.shockBtn.cooldown = this.p2.shockBtn.maxCooldown;
+                this.p2.shockBtn.flash = 0.25;
+                this.onShockTrigger(2);
+              }
+            }
+          });
+          window.addEventListener('keyup', (e) => {
+            this.keys[e.code] = false;
+          });
+        }
+
+        step(dt) {
+          if (!this.enabled) return;
+
+          if (this.p1.shockBtn.cooldown > 0) this.p1.shockBtn.cooldown = Math.max(0, this.p1.shockBtn.cooldown - dt);
+          if (this.p2.shockBtn.cooldown > 0) this.p2.shockBtn.cooldown = Math.max(0, this.p2.shockBtn.cooldown - dt);
+          if (this.p1.shockBtn.flash > 0) this.p1.shockBtn.flash = Math.max(0, this.p1.shockBtn.flash - dt);
+          if (this.p2.shockBtn.flash > 0) this.p2.shockBtn.flash = Math.max(0, this.p2.shockBtn.flash - dt);
+
+          // Keyboard support when touch isn't active
+          if (!this.p1.active) {
+            let kx = 0, ky = 0;
+            if (this.keys['KeyA']) kx -= 1;
+            if (this.keys['KeyD']) kx += 1;
+            if (this.keys['KeyW']) ky -= 1;
+            if (this.keys['KeyS']) ky += 1;
+            if (kx !== 0 || ky !== 0) {
+              const d = Math.hypot(kx, ky);
+              this.p1.nx = kx / d;
+              this.p1.ny = ky / d;
+              this.p1.magnitude = 1;
+              this.p1.knobX = this.p1.baseX + this.p1.nx * this.baseRadius;
+              this.p1.knobY = this.p1.baseY + this.p1.ny * this.baseRadius;
+            } else {
+              this.p1.nx = 0;
+              this.p1.ny = 0;
+              this.p1.magnitude = 0;
+              this.p1.knobX = this.p1.baseX;
+              this.p1.knobY = this.p1.baseY;
+            }
+          }
+
+          if (!this.p2.active) {
+            let kx = 0, ky = 0;
+            if (this.keys['ArrowLeft']) kx -= 1;
+            if (this.keys['ArrowRight']) kx += 1;
+            if (this.keys['ArrowUp']) ky -= 1;
+            if (this.keys['ArrowDown']) ky += 1;
+            if (kx !== 0 || ky !== 0) {
+              const d = Math.hypot(kx, ky);
+              this.p2.nx = kx / d;
+              this.p2.ny = ky / d;
+              this.p2.magnitude = 1;
+              this.p2.knobX = this.p2.baseX + this.p2.nx * this.baseRadius;
+              this.p2.knobY = this.p2.baseY + this.p2.ny * this.baseRadius;
+            } else {
+              this.p2.nx = 0;
+              this.p2.ny = 0;
+              this.p2.magnitude = 0;
+              this.p2.knobX = this.p2.baseX;
+              this.p2.knobY = this.p2.baseY;
+            }
+          }
+        }
+
+        render(ctx) {
+          if (!this.enabled) return;
+          this.drawStick(ctx, this.p1, false);
+          this.drawStick(ctx, this.p2, true);
+          if (this.hasShockBtn) {
+            this.drawShockBtn(ctx, this.p1, false);
+            this.drawShockBtn(ctx, this.p2, true);
+          }
+        }
+
+        drawStick(ctx, stick, rotated) {
+          const isDynamicIdle = this.mode === 'dynamic' && !stick.active && stick.magnitude === 0;
+          ctx.save();
+          ctx.globalAlpha = isDynamicIdle ? 0.34 : (stick.active || stick.magnitude > 0 ? 0.94 : 0.65);
+
+          // Outer Base Ring
+          ctx.fillStyle = `${stick.color}16`;
+          ctx.strokeStyle = stick.color;
+          ctx.shadowColor = stick.color;
+          ctx.shadowBlur = stick.active ? 16 : 8;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(stick.baseX, stick.baseY, safeR(this.baseRadius), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Crosshair Guide
+          ctx.shadowBlur = 0;
+          ctx.strokeStyle = `${stick.color}44`;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(stick.baseX - 10, stick.baseY);
+          ctx.lineTo(stick.baseX + 10, stick.baseY);
+          ctx.moveTo(stick.baseX, stick.baseY - 10);
+          ctx.lineTo(stick.baseX, stick.baseY + 10);
+          ctx.stroke();
+
+          // Direction Line
+          if (stick.magnitude > 0.06) {
+            ctx.strokeStyle = stick.color;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(stick.baseX, stick.baseY);
+            ctx.lineTo(stick.knobX, stick.knobY);
+            ctx.stroke();
+          }
+
+          // Thumb Knob
+          ctx.fillStyle = stick.color;
+          ctx.shadowColor = stick.color;
+          ctx.shadowBlur = 14;
+          ctx.beginPath();
+          ctx.arc(stick.knobX, stick.knobY, safeR(this.knobRadius), 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(stick.knobX, stick.knobY, safeR(this.knobRadius * 0.38), 0, Math.PI * 2);
+          ctx.fill();
+
+          // Label
+          ctx.save();
+          ctx.translate(stick.baseX, stick.baseY + (rotated ? -this.baseRadius - 12 : this.baseRadius + 12));
+          if (rotated) ctx.rotate(Math.PI);
+          ctx.font = '700 9px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = 'rgba(255,255,255,0.55)';
+          ctx.fillText(this.mode === 'dynamic' ? 'DİNAMİK' : 'JOYSTICK', 0, 0);
+          ctx.restore();
+
+          ctx.restore();
+        }
+
+        drawShockBtn(ctx, player, rotated) {
+          const btn = player.shockBtn;
+          const ready = btn.cooldown <= 0;
+          const progress = ready ? 1 : 1 - (btn.cooldown / btn.maxCooldown);
+
+          ctx.save();
+          ctx.translate(btn.x, btn.y);
+          if (rotated) ctx.rotate(Math.PI);
+
+          ctx.fillStyle = ready ? 'rgba(255, 190, 11, 0.24)' : 'rgba(15, 23, 42, 0.78)';
+          ctx.strokeStyle = ready ? '#ffbe0b' : 'rgba(255, 255, 255, 0.18)';
+          ctx.shadowColor = ready ? '#ffbe0b' : 'transparent';
+          ctx.shadowBlur = ready ? 16 : 0;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(0, 0, safeR(this.shockRadius), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          if (!ready) {
+            ctx.strokeStyle = '#ffbe0b';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(0, 0, safeR(this.shockRadius), -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * progress);
+            ctx.stroke();
+          }
+
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = ready ? '#ffbe0b' : 'rgba(255, 255, 255, 0.45)';
+          ctx.font = '900 12px Orbitron, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('ŞOK', 0, 0);
+
+          ctx.restore();
+        }
+      }
+
+      /* =========================================================================
+       * 5. VISUAL EFFECTS ENGINE (Sparks, Shockwaves, Dual Banners, Screen Shake)
+       * ========================================================================= */
+      class VisualEffects {
+        constructor() {
+          this.particles = [];
+          this.rings = [];
+          this.banners = [];
+          this.shakeTime = 0;
+          this.shakeMag = 0;
+        }
+
+        clear() {
+          this.particles = [];
+          this.rings = [];
+          this.banners = [];
+          this.shakeTime = 0;
+          this.shakeMag = 0;
+        }
+
+        shake(mag = 8, duration = 0.22) {
+          this.shakeMag = Math.max(this.shakeMag, mag);
+          this.shakeTime = Math.max(this.shakeTime, duration);
+        }
+
+        spawnSparks(x, y, color, count = 16, speed = 240) {
+          for (let i = 0; i < count; i++) {
+            const ang = Math.random() * Math.PI * 2;
+            const spd = (0.25 + Math.random() * 0.75) * speed;
+            this.particles.push({
+              x, y,
+              vx: Math.cos(ang) * spd,
+              vy: Math.sin(ang) * spd,
+              life: 0.35 + Math.random() * 0.25,
+              maxLife: 0.6,
+              size: 2 + Math.random() * 2.5,
+              color
+            });
+          }
+        }
+
+        spawnRing(x, y, color, maxRadius = 90, duration = 0.35) {
+          this.rings.push({
+            x, y, color,
+            radius: 6,
+            maxRadius: Math.max(12, maxRadius),
+            life: duration,
+            maxLife: duration
+          });
+        }
+
+        spawnBanner(text, color = '#ffffff', duration = 1.1) {
+          this.banners = [{ text, color, life: duration, maxLife: duration }];
+        }
+
+        update(dt) {
+          if (this.shakeTime > 0) {
+            this.shakeTime = Math.max(0, this.shakeTime - dt);
+            if (this.shakeTime === 0) this.shakeMag = 0;
+          }
+
+          for (let i = this.particles.length - 1; i >= 0; i--) {
+            const p = this.particles[i];
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            p.vx *= Math.pow(0.92, dt * 60);
+            p.vy *= Math.pow(0.92, dt * 60);
+            p.life -= dt;
+            if (p.life <= 0) this.particles.splice(i, 1);
+          }
+
+          for (let i = this.rings.length - 1; i >= 0; i--) {
+            const r = this.rings[i];
+            r.life -= dt;
+            const prog = clamp(1 - r.life / r.maxLife, 0, 1);
+            r.radius = 6 + (r.maxRadius - 6) * prog;
+            if (r.life <= 0) this.rings.splice(i, 1);
+          }
+
+          for (let i = this.banners.length - 1; i >= 0; i--) {
+            this.banners[i].life -= dt;
+            if (this.banners[i].life <= 0) this.banners.splice(i, 1);
+          }
+        }
+
+        applyShake(ctx) {
+          if (this.shakeTime > 0 && this.shakeMag > 0) {
+            const ox = (Math.random() * 2 - 1) * this.shakeMag;
+            const oy = (Math.random() * 2 - 1) * this.shakeMag;
+            ctx.translate(ox, oy);
+          }
+        }
+
+        render(ctx, w, h) {
+          for (const r of this.rings) {
+            const alpha = clamp(r.life / r.maxLife, 0, 1);
+            ctx.save();
+            ctx.globalAlpha = alpha * 0.85;
+            ctx.strokeStyle = r.color;
+            ctx.shadowColor = r.color;
+            ctx.shadowBlur = 12;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(r.x, r.y, safeR(r.radius), 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          for (const p of this.particles) {
+            const alpha = clamp(p.life / p.maxLife, 0, 1);
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, safeR(p.size * alpha), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+
+          for (const b of this.banners) {
+            const alpha = clamp((b.life / b.maxLife) * 2.2, 0, 1);
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.font = '900 22px Orbitron, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = b.color;
+            ctx.shadowColor = b.color;
+            ctx.shadowBlur = 16;
+
+            // Bottom Player (Upright)
+            ctx.fillText(b.text, w * 0.5, h * 0.5 + 36);
+
+            // Top Player (Rotated 180deg)
+            ctx.save();
+            ctx.translate(w * 0.5, h * 0.5 - 36);
+            ctx.rotate(Math.PI);
+            ctx.fillText(b.text, 0, 0);
+            ctx.restore();
+
+            ctx.restore();
+          }
+        }
+      }
+
+      /* =========================================================================
+       * 6. MINI-GAME 1: KAOTİK NEON HAVA HOKEYİ (Air Hockey)
+       * ========================================================================= */
+      class AirHockeyGame {
+        constructor(settings, vfx) {
+          this.settings = settings;
+          this.vfx = vfx;
+          this.p1Score = 0;
+          this.p2Score = 0;
+          this.winScore = settings.winScore || 5;
+          this.powerupsEnabled = settings.powerups !== false;
+          this.speedMult = settings.puckSpeed === 'chaos' ? 1.55 : settings.puckSpeed === 'fast' ? 1.28 : 1.0;
+
+          this.pucks = [];
+          this.powerupOrb = null;
+          this.powerupTimer = 3.5;
+          this.invisibleTimer = 0;
+          this.elapsed = 0;
+          this.activeEffects = {
+            p1Giant: 0,
+            p2Giant: 0,
+            p1WideGoal: 0,
+            p2WideGoal: 0
+          };
+        }
+
+        init(w, h, input) {
+          this.baseMalletR = clamp(Math.min(w, h) * 0.062, 24, 38);
+          this.puckR = clamp(Math.min(w, h) * 0.036, 14, 22);
+
+          this.p1 = { x: w * 0.5, y: h * 0.80, vx: 0, vy: 0 };
+          this.p2 = { x: w * 0.5, y: h * 0.20, vx: 0, vy: 0 };
+          input.p1.x = this.p1.x; input.p1.y = this.p1.y;
+          input.p2.x = this.p2.x; input.p2.y = this.p2.y;
+
+          this.pucks = [];
+          this.spawnPuck(w, h, 0);
+        }
+
+        spawnPuck(w, h, dirY = 0) {
+          const ang = (Math.random() * 0.8 - 0.4) + (dirY > 0 ? Math.PI / 2 : dirY < 0 ? -Math.PI / 2 : 0);
+          const spd = dirY === 0 ? 0 : 290 * this.speedMult;
+          this.pucks.push({
+            x: w * 0.5,
+            y: h * 0.5,
+            vx: Math.cos(ang) * spd,
+            vy: Math.sin(ang) * spd,
+            spin: 0,
+            trail: []
+          });
+        }
+
+        resetRound(w, h, scorer) {
+          this.pucks = [];
+          this.powerupOrb = null;
+          this.invisibleTimer = 0;
+          this.activeEffects = { p1Giant: 0, p2Giant: 0, p1WideGoal: 0, p2WideGoal: 0 };
+          this.spawnPuck(w, h, scorer === 1 ? -1 : 1);
+        }
+
+        spawnRandomPowerup(w, h) {
+          const types = [
+            { id: 'triple', label: "3'LÜ DİSK", color: '#ffbe0b' },
+            { id: 'giant', label: 'DEV TOKMAK', color: '#00ff88' },
+            { id: 'wide', label: 'GENİŞ KALE', color: '#ff2a85' },
+            { id: 'invisible', label: 'GÖRÜNMEZ DİSK', color: '#b829ff' }
+          ];
+          const chosen = types[Math.floor(Math.random() * types.length)];
+          this.powerupOrb = {
+            ...chosen,
+            x: w * (0.24 + Math.random() * 0.52),
+            y: h * 0.5,
+            radius: 20,
+            pulse: 0
+          };
+        }
+
+        update(dt, w, h, input, onGoal) {
+          this.elapsed += dt;
+
+          // Effect timers
+          if (this.activeEffects.p1Giant > 0) this.activeEffects.p1Giant = Math.max(0, this.activeEffects.p1Giant - dt);
+          if (this.activeEffects.p2Giant > 0) this.activeEffects.p2Giant = Math.max(0, this.activeEffects.p2Giant - dt);
+          if (this.activeEffects.p1WideGoal > 0) this.activeEffects.p1WideGoal = Math.max(0, this.activeEffects.p1WideGoal - dt);
+          if (this.activeEffects.p2WideGoal > 0) this.activeEffects.p2WideGoal = Math.max(0, this.activeEffects.p2WideGoal - dt);
+          if (this.invisibleTimer > 0) this.invisibleTimer = Math.max(0, this.invisibleTimer - dt);
+
+          const r1 = this.baseMalletR * (this.activeEffects.p1Giant > 0 ? 1.52 : 1);
+          const r2 = this.baseMalletR * (this.activeEffects.p2Giant > 0 ? 1.52 : 1);
+
+          // Constrain mallets to their halves
+          const target1X = clamp(input.p1.x, r1 + 10, w - r1 - 10);
+          const target1Y = clamp(input.p1.y, h * 0.5 + r1 + 4, h - r1 - 10);
+          this.p1.vx = (target1X - this.p1.x) / Math.max(0.001, dt);
+          this.p1.vy = (target1Y - this.p1.y) / Math.max(0.001, dt);
+          this.p1.x = target1X;
+          this.p1.y = target1Y;
+
+          const target2X = clamp(input.p2.x, r2 + 10, w - r2 - 10);
+          const target2Y = clamp(input.p2.y, r2 + 10, h * 0.5 - r2 - 4);
+          this.p2.vx = (target2X - this.p2.x) / Math.max(0.001, dt);
+          this.p2.vy = (target2Y - this.p2.y) / Math.max(0.001, dt);
+          this.p2.x = target2X;
+          this.p2.y = target2Y;
+
+          // Power-up Spawner
+          if (this.powerupsEnabled) {
+            if (!this.powerupOrb) {
+              this.powerupTimer -= dt;
+              if (this.powerupTimer <= 0) {
+                this.spawnRandomPowerup(w, h);
+                this.powerupTimer = 6.5;
+              }
+            } else {
+              this.powerupOrb.pulse += dt * 5;
+            }
+          }
+
+          // Goal widths (opponent's wide goal effect widens THEIR goal!)
+          const topGoalW = w * (this.activeEffects.p2WideGoal > 0 ? 0.58 : 0.36);
+          const botGoalW = w * (this.activeEffects.p1WideGoal > 0 ? 0.58 : 0.36);
+
+          const maxSpeed = 1080 * this.speedMult;
+          const subSteps = 3;
+          const subDt = dt / subSteps;
+
+          for (let i = this.pucks.length - 1; i >= 0; i--) {
+            const puck = this.pucks[i];
+
+            for (let s = 0; s < subSteps; s++) {
+              puck.vx += puck.spin * subDt;
+              puck.spin *= Math.pow(0.99, subDt * 60);
+              puck.x += puck.vx * subDt;
+              puck.y += puck.vy * subDt;
+
+              // Subtle friction
+              const friction = this.settings.puckSpeed === 'chaos' ? 0.996 : 0.988;
+              puck.vx *= Math.pow(friction, subDt * 60);
+              puck.vy *= Math.pow(friction, subDt * 60);
+
+              // Left/Right Walls
+              if (puck.x - this.puckR < 8) {
+                puck.x = 8 + this.puckR;
+                puck.vx = Math.abs(puck.vx) * 0.95;
+                if (s === 0) {
+                  sound.playWall();
+                  this.vfx.spawnSparks(8, puck.y, '#00f0ff', 6, 140);
+                }
+              } else if (puck.x + this.puckR > w - 8) {
+                puck.x = w - 8 - this.puckR;
+                puck.vx = -Math.abs(puck.vx) * 0.95;
+                if (s === 0) {
+                  sound.playWall();
+                  this.vfx.spawnSparks(w - 8, puck.y, '#ff2a85', 6, 140);
+                }
+              }
+
+              // Top Wall / P2 Goal
+              const topGoalL = (w - topGoalW) * 0.5;
+              const topGoalR = (w + topGoalW) * 0.5;
+              if (puck.y - this.puckR < 8) {
+                if (puck.x > topGoalL && puck.x < topGoalR) {
+                  if (puck.y < -this.puckR * 0.35) {
+                    this.p1Score++;
+                    sound.playScore(true);
+                    this.vfx.shake(12, 0.28);
+                    this.vfx.spawnSparks(puck.x, 12, '#00f0ff', 28, 360);
+                    this.vfx.spawnBanner('GOL! 1. OYUNCU', '#00f0ff', 1.1);
+                    onGoal(1);
+                    return;
+                  }
+                } else {
+                  puck.y = 8 + this.puckR;
+                  puck.vy = Math.abs(puck.vy) * 0.95;
+                  if (s === 0) {
+                    sound.playWall();
+                    this.vfx.spawnSparks(puck.x, 8, '#ff2a85', 6, 140);
+                  }
+                }
+              }
+
+              // Bottom Wall / P1 Goal
+              const botGoalL = (w - botGoalW) * 0.5;
+              const botGoalR = (w + botGoalW) * 0.5;
+              if (puck.y + this.puckR > h - 8) {
+                if (puck.x > botGoalL && puck.x < botGoalR) {
+                  if (puck.y > h + this.puckR * 0.35) {
+                    this.p2Score++;
+                    sound.playScore(false);
+                    this.vfx.shake(12, 0.28);
+                    this.vfx.spawnSparks(puck.x, h - 12, '#ff2a85', 28, 360);
+                    this.vfx.spawnBanner('GOL! 2. OYUNCU', '#ff2a85', 1.1);
+                    onGoal(2);
+                    return;
+                  }
+                } else {
+                  puck.y = h - 8 - this.puckR;
+                  puck.vy = -Math.abs(puck.vy) * 0.95;
+                  if (s === 0) {
+                    sound.playWall();
+                    this.vfx.spawnSparks(puck.x, h - 8, '#00f0ff', 6, 140);
+                  }
+                }
+              }
+
+              // Mallet Collisions
+              this.collideMallet(puck, this.p1, r1, '#00f0ff', maxSpeed, 1);
+              this.collideMallet(puck, this.p2, r2, '#ff2a85', maxSpeed, 2);
+            }
+
+            // Power-up orb pickup
+            if (this.powerupOrb) {
+              const dOrb = Math.hypot(puck.x - this.powerupOrb.x, puck.y - this.powerupOrb.y);
+              if (dOrb < this.puckR + this.powerupOrb.radius) {
+                this.activatePowerup(this.powerupOrb, puck, w, h);
+                this.powerupOrb = null;
+              }
+            }
+
+            puck.trail.push({ x: puck.x, y: puck.y });
+            if (puck.trail.length > 10) puck.trail.shift();
+          }
+        }
+
+        collideMallet(puck, mallet, mR, color, maxSpeed, playerNum) {
+          const dx = puck.x - mallet.x;
+          const dy = puck.y - mallet.y;
+          const dist = Math.hypot(dx, dy);
+          const minDist = this.puckR + mR;
+
+          if (dist < minDist && dist > 0.001) {
+            const nx = dx / dist;
+            const ny = dy / dist;
+            puck.x = mallet.x + nx * (minDist + 1);
+            puck.y = mallet.y + ny * (minDist + 1);
+
+            const rvx = puck.vx - mallet.vx;
+            const rvy = puck.vy - mallet.vy;
+            const velAlongNormal = rvx * nx + rvy * ny;
+
+            if (velAlongNormal < 0) {
+              const impulse = -1.92 * velAlongNormal;
+              puck.vx += impulse * nx + mallet.vx * 0.34;
+              puck.vy += impulse * ny + mallet.vy * 0.34;
+              puck.spin = clamp(mallet.vx * 0.38, -440, 440);
+
+              const spd = Math.hypot(puck.vx, puck.vy);
+              if (spd > maxSpeed) {
+                puck.vx = (puck.vx / spd) * maxSpeed;
+                puck.vy = (puck.vy / spd) * maxSpeed;
+              }
+              puck.lastTouchedBy = playerNum;
+              sound.playHit(clamp(spd / 600, 0.3, 1.3));
+              this.vfx.spawnSparks(puck.x - nx * this.puckR, puck.y - ny * this.puckR, color, 12, 240);
+            }
+          }
+        }
+
+        activatePowerup(orb, puck, w, h) {
+          sound.playPowerup();
+          this.vfx.spawnRing(orb.x, orb.y, orb.color, 95, 0.36);
+          this.vfx.spawnSparks(orb.x, orb.y, orb.color, 20, 260);
+          this.vfx.spawnBanner(orb.label, orb.color, 1.0);
+
+          const owner = puck.lastTouchedBy || (puck.vy < 0 ? 1 : 2);
+          if (orb.id === 'triple') {
+            for (let k = 0; k < 2; k++) {
+              const ang = Math.random() * Math.PI * 2;
+              const spd = 340 * this.speedMult;
+              this.pucks.push({
+                x: orb.x,
+                y: orb.y,
+                vx: Math.cos(ang) * spd,
+                vy: Math.sin(ang) * spd,
+                spin: 0,
+                trail: []
+              });
+            }
+          } else if (orb.id === 'giant') {
+            if (owner === 1) this.activeEffects.p1Giant = 8.0;
+            else this.activeEffects.p2Giant = 8.0;
+          } else if (orb.id === 'wide') {
+            // Widen opponent's goal!
+            if (owner === 1) this.activeEffects.p2WideGoal = 8.0;
+            else this.activeEffects.p1WideGoal = 8.0;
+          } else if (orb.id === 'invisible') {
+            this.invisibleTimer = 6.0;
+          }
+        }
+
+        render(ctx, w, h) {
+          // Rink border
+          ctx.save();
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+          ctx.lineWidth = 4;
+          ctx.strokeRect(8, 8, Math.max(10, w - 16), Math.max(10, h - 16));
+
+          // Center line & circle
+          ctx.strokeStyle = 'rgba(0, 240, 255, 0.22)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(8, h * 0.5);
+          ctx.lineTo(w - 8, h * 0.5);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(w * 0.5, h * 0.5, safeR(Math.min(w, h) * 0.14), 0, Math.PI * 2);
+          ctx.stroke();
+
+          // Top Goal (P2 Goal)
+          const topGoalW = w * (this.activeEffects.p2WideGoal > 0 ? 0.58 : 0.36);
+          ctx.strokeStyle = '#ff2a85';
+          ctx.shadowColor = '#ff2a85';
+          ctx.shadowBlur = 16;
+          ctx.lineWidth = 7;
+          ctx.beginPath();
+          ctx.moveTo((w - topGoalW) * 0.5, 8);
+          ctx.lineTo((w + topGoalW) * 0.5, 8);
+          ctx.stroke();
+
+          // Bottom Goal (P1 Goal)
+          const botGoalW = w * (this.activeEffects.p1WideGoal > 0 ? 0.58 : 0.36);
+          ctx.strokeStyle = '#00f0ff';
+          ctx.shadowColor = '#00f0ff';
+          ctx.beginPath();
+          ctx.moveTo((w - botGoalW) * 0.5, h - 8);
+          ctx.lineTo((w + botGoalW) * 0.5, h - 8);
+          ctx.stroke();
+          ctx.restore();
+
+          // Powerup Orb
+          if (this.powerupOrb) {
+            const orb = this.powerupOrb;
+            const pulseR = safeR(orb.radius + Math.sin(orb.pulse) * 3);
+            ctx.save();
+            ctx.fillStyle = `${orb.color}28`;
+            ctx.strokeStyle = orb.color;
+            ctx.shadowColor = orb.color;
+            ctx.shadowBlur = 16;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.arc(orb.x, orb.y, pulseR, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = orb.color;
+            ctx.beginPath();
+            ctx.arc(orb.x, orb.y, safeR(6), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+
+          // Pucks (with optional Görünmez Disk cloak shimmer)
+          const cloakAlpha = this.invisibleTimer > 0
+            ? (0.12 + 0.25 * Math.pow(Math.sin(this.elapsed * 7), 2))
+            : 1.0;
+
+          for (const puck of this.pucks) {
+            ctx.save();
+            ctx.globalAlpha = cloakAlpha;
+
+            for (let i = 0; i < puck.trail.length; i++) {
+              const pt = puck.trail[i];
+              const ratio = (i + 1) / puck.trail.length;
+              ctx.fillStyle = `rgba(255, 255, 255, ${ratio * 0.2})`;
+              ctx.beginPath();
+              ctx.arc(pt.x, pt.y, safeR(this.puckR * ratio * 0.85), 0, Math.PI * 2);
+              ctx.fill();
+            }
+
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = '#ffffff';
+            ctx.shadowBlur = 18;
+            ctx.beginPath();
+            ctx.arc(puck.x, puck.y, safeR(this.puckR), 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#00f0ff';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(puck.x, puck.y, safeR(this.puckR * 0.6), 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // Mallets
+          const r1 = this.baseMalletR * (this.activeEffects.p1Giant > 0 ? 1.52 : 1);
+          const r2 = this.baseMalletR * (this.activeEffects.p2Giant > 0 ? 1.52 : 1);
+          this.drawMallet(ctx, this.p1.x, this.p1.y, r1, '#00f0ff');
+          this.drawMallet(ctx, this.p2.x, this.p2.y, r2, '#ff2a85');
+        }
+
+        drawMallet(ctx, x, y, r, color) {
+          ctx.save();
+          ctx.fillStyle = `${color}28`;
+          ctx.strokeStyle = color;
+          ctx.shadowColor = color;
+          ctx.shadowBlur = 18;
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.arc(x, y, safeR(r), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.arc(x, y, safeR(r * 0.42), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      /* =========================================================================
+       * 7. MINI-GAME 2: PARMAK SUMOSU (Joystick + ŞOK Wave Ring Sumo)
+       * ========================================================================= */
+      class SumoGame {
+        constructor(settings, vfx) {
+          this.settings = settings;
+          this.vfx = vfx;
+          this.p1Score = 0;
+          this.p2Score = 0;
+          this.winScore = settings.winScore || 5;
+          this.shrinkRate = settings.shrinkSpeed === 'slow' ? 5.2 : settings.shrinkSpeed === 'fast' ? 14.5 : 9.2;
+        }
+
+        init(w, h) {
+          this.cx = w * 0.5;
+          this.cy = h * 0.5;
+          this.maxR = Math.max(90, Math.min(w, h) * 0.42);
+          this.minR = Math.max(48, Math.min(w, h) * 0.16);
+          this.ringR = this.maxR;
+
+          const baseR = clamp(Math.min(w, h) * 0.052, 22, 34);
+          this.p1 = {
+            x: this.cx,
+            y: this.cy + this.ringR * 0.45,
+            vx: 0, vy: 0,
+            radius: baseR,
+            mass: 1.0,
+            dashTimer: 0,
+            color: '#00f0ff'
+          };
+          this.p2 = {
+            x: this.cx,
+            y: this.cy - this.ringR * 0.45,
+            vx: 0, vy: 0,
+            radius: baseR,
+            mass: 1.0,
+            dashTimer: 0,
+            color: '#ff2a85'
+          };
+
+          this.orbs = [];
+          this.orbTimer = 1.8;
+        }
+
+        resetRound(w, h) {
+          this.init(w, h);
+        }
+
+        triggerShock(playerNum, joystick) {
+          const attacker = playerNum === 1 ? this.p1 : this.p2;
+          const target = playerNum === 1 ? this.p2 : this.p1;
+          const stick = playerNum === 1 ? joystick.p1 : joystick.p2;
+
+          let dx = stick.nx;
+          let dy = stick.ny;
+          if (stick.magnitude < 0.15) {
+            const tx = target.x - attacker.x;
+            const ty = target.y - attacker.y;
+            const d = Math.hypot(tx, ty) || 1;
+            dx = tx / d;
+            dy = ty / d;
+          }
+
+          // Burst of speed
+          attacker.vx += dx * 680;
+          attacker.vy += dy * 680;
+          attacker.dashTimer = 0.35;
+
+          // Radial knockback shockwave if opponent is within range
+          const shockRange = attacker.radius + target.radius + 95;
+          const distToTarget = Math.hypot(target.x - attacker.x, target.y - attacker.y);
+          if (distToTarget < shockRange && distToTarget > 0.001) {
+            const falloff = 1 - distToTarget / shockRange;
+            const nx = (target.x - attacker.x) / distToTarget;
+            const ny = (target.y - attacker.y) / distToTarget;
+            const pushForce = (460 + 380 * falloff) / target.mass;
+            target.vx += nx * pushForce;
+            target.vy += ny * pushForce;
+          }
+
+          sound.playDash();
+          this.vfx.spawnRing(attacker.x, attacker.y, '#ffbe0b', shockRange, 0.34);
+          this.vfx.spawnSparks(attacker.x, attacker.y, attacker.color, 18, 280);
+          this.vfx.shake(6, 0.15);
+        }
+
+        update(dt, w, h, joystick, onRoundWin) {
+          this.cx = w * 0.5;
+          this.cy = h * 0.5;
+
+          if (this.ringR > this.minR) {
+            this.ringR = Math.max(this.minR, this.ringR - this.shrinkRate * dt);
+          }
+
+          if (this.p1.dashTimer > 0) this.p1.dashTimer = Math.max(0, this.p1.dashTimer - dt);
+          if (this.p2.dashTimer > 0) this.p2.dashTimer = Math.max(0, this.p2.dashTimer - dt);
+
+          const accel = 1360;
+          const damping = Math.pow(0.91, dt * 60);
+
+          if (joystick.p1.magnitude > 0.05) {
+            this.p1.vx += joystick.p1.nx * joystick.p1.magnitude * accel * dt;
+            this.p1.vy += joystick.p1.ny * joystick.p1.magnitude * accel * dt;
+          }
+          if (joystick.p2.magnitude > 0.05) {
+            this.p2.vx += joystick.p2.nx * joystick.p2.magnitude * accel * dt;
+            this.p2.vy += joystick.p2.ny * joystick.p2.magnitude * accel * dt;
+          }
+
+          this.p1.vx *= damping;
+          this.p1.vy *= damping;
+          this.p2.vx *= damping;
+          this.p2.vy *= damping;
+
+          this.p1.x += this.p1.vx * dt;
+          this.p1.y += this.p1.vy * dt;
+          this.p2.x += this.p2.vx * dt;
+          this.p2.y += this.p2.vy * dt;
+
+          // Energy Orbs
+          this.orbTimer -= dt;
+          if (this.orbTimer <= 0 && this.orbs.length < 2) {
+            const ang = Math.random() * Math.PI * 2;
+            const dist = Math.random() * (this.ringR * 0.65);
+            this.orbs.push({
+              x: this.cx + Math.cos(ang) * dist,
+              y: this.cy + Math.sin(ang) * dist,
+              radius: 12,
+              pulse: 0
+            });
+            this.orbTimer = 3.2;
+          }
+
+          for (let i = this.orbs.length - 1; i >= 0; i--) {
+            const orb = this.orbs[i];
+            orb.pulse += dt * 6;
+            const d1 = Math.hypot(this.p1.x - orb.x, this.p1.y - orb.y);
+            const d2 = Math.hypot(this.p2.x - orb.x, this.p2.y - orb.y);
+            if (d1 < this.p1.radius + orb.radius) {
+              this.growPlayer(this.p1, orb);
+              this.orbs.splice(i, 1);
+            } else if (d2 < this.p2.radius + orb.radius) {
+              this.growPlayer(this.p2, orb);
+              this.orbs.splice(i, 1);
+            }
+          }
+
+          // Elastic Mass-Weighted Collision
+          const dx = this.p2.x - this.p1.x;
+          const dy = this.p2.y - this.p1.y;
+          const dist = Math.hypot(dx, dy);
+          const minDist = this.p1.radius + this.p2.radius;
+
+          if (dist < minDist && dist > 0.001) {
+            const nx = dx / dist;
+            const ny = dy / dist;
+            const overlap = minDist - dist;
+            const totalMass = this.p1.mass + this.p2.mass;
+
+            this.p1.x -= nx * overlap * (this.p2.mass / totalMass);
+            this.p1.y -= ny * overlap * (this.p2.mass / totalMass);
+            this.p2.x += nx * overlap * (this.p1.mass / totalMass);
+            this.p2.y += ny * overlap * (this.p1.mass / totalMass);
+
+            const rvx = this.p2.vx - this.p1.vx;
+            const rvy = this.p2.vy - this.p1.vy;
+            const velAlongNormal = rvx * nx + rvy * ny;
+
+            if (velAlongNormal < 0) {
+              const boost = (this.p1.dashTimer > 0 || this.p2.dashTimer > 0) ? 1.52 : 1.28;
+              const j = -(1 + boost) * velAlongNormal / (1 / this.p1.mass + 1 / this.p2.mass);
+              this.p1.vx -= (j / this.p1.mass) * nx;
+              this.p1.vy -= (j / this.p1.mass) * ny;
+              this.p2.vx += (j / this.p2.mass) * nx;
+              this.p2.vy += (j / this.p2.mass) * ny;
+
+              const impact = clamp(Math.abs(velAlongNormal) / 400, 0.3, 1.4);
+              sound.playHit(impact);
+              const mx = (this.p1.x + this.p2.x) * 0.5;
+              const my = (this.p1.y + this.p2.y) * 0.5;
+              this.vfx.spawnRing(mx, my, '#ffbe0b', 95, 0.32);
+              this.vfx.spawnSparks(mx, my, '#ffffff', 18, 300);
+              this.vfx.shake(8 * impact, 0.2);
+            }
+          }
+
+          // Ring-Out Check
+          const distP1 = Math.hypot(this.p1.x - this.cx, this.p1.y - this.cy);
+          const distP2 = Math.hypot(this.p2.x - this.cx, this.p2.y - this.cy);
+
+          if (distP1 > this.ringR) {
+            this.p2Score++;
+            sound.playExplosion();
+            this.vfx.shake(14, 0.32);
+            this.vfx.spawnSparks(this.p1.x, this.p1.y, '#00f0ff', 32, 400);
+            this.vfx.spawnBanner('HALKA DIŞI! +1', '#ff2a85', 1.1);
+            onRoundWin(2);
+          } else if (distP2 > this.ringR) {
+            this.p1Score++;
+            sound.playExplosion();
+            this.vfx.shake(14, 0.32);
+            this.vfx.spawnSparks(this.p2.x, this.p2.y, '#ff2a85', 32, 400);
+            this.vfx.spawnBanner('HALKA DIŞI! +1', '#00f0ff', 1.1);
+            onRoundWin(1);
+          }
+        }
+
+        growPlayer(player, orb) {
+          sound.playPowerup();
+          player.mass = Math.min(2.0, player.mass + 0.22);
+          player.radius = Math.min(54, player.radius * 1.11);
+          this.vfx.spawnRing(orb.x, orb.y, '#ffbe0b', 60, 0.28);
+          this.vfx.spawnSparks(orb.x, orb.y, '#ffbe0b', 14, 190);
+        }
+
+        render(ctx) {
+          const outerR = safeR(this.ringR * 1.12);
+          const innerR = safeR(this.ringR * 0.72);
+
+          ctx.save();
+          const grad = ctx.createRadialGradient(this.cx, this.cy, innerR, this.cx, this.cy, outerR);
+          grad.addColorStop(0, 'rgba(255, 190, 11, 0.02)');
+          grad.addColorStop(0.88, 'rgba(255, 190, 11, 0.16)');
+          grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(this.cx, this.cy, outerR, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Arena Ring
+          ctx.strokeStyle = '#ffbe0b';
+          ctx.shadowColor = '#ffbe0b';
+          ctx.shadowBlur = 18;
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.arc(this.cx, this.cy, safeR(this.ringR), 0, Math.PI * 2);
+          ctx.stroke();
+
+          // Center Line
+          ctx.shadowBlur = 0;
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(this.cx - Math.max(0, this.ringR - 8), this.cy);
+          ctx.lineTo(this.cx + Math.max(0, this.ringR - 8), this.cy);
+          ctx.stroke();
+          ctx.restore();
+
+          // Orbs
+          for (const orb of this.orbs) {
+            const r = safeR(orb.radius + Math.sin(orb.pulse) * 2.5);
+            ctx.save();
+            ctx.fillStyle = '#ffbe0b';
+            ctx.shadowColor = '#ffbe0b';
+            ctx.shadowBlur = 14;
+            ctx.beginPath();
+            ctx.arc(orb.x, orb.y, r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+
+          // Players
+          this.drawSumo(ctx, this.p1);
+          this.drawSumo(ctx, this.p2);
+        }
+
+        drawSumo(ctx, p) {
+          const dashing = p.dashTimer > 0;
+          ctx.save();
+          ctx.fillStyle = `${p.color}33`;
+          ctx.strokeStyle = dashing ? '#ffbe0b' : p.color;
+          ctx.shadowColor = dashing ? '#ffbe0b' : p.color;
+          ctx.shadowBlur = dashing ? 24 : 18;
+          ctx.lineWidth = dashing ? 5 : 4;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, safeR(p.radius), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, safeR(p.radius * 0.34), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      /* =========================================================================
+       * 8. MINI-GAME 3: SERBEST ÇİZGİ DÜELLOSU (360° Joystick Touch Tron)
+       * ========================================================================= */
+      class TronGame {
+        constructor(settings, vfx) {
+          this.settings = settings;
+          this.vfx = vfx;
+          this.p1Score = 0;
+          this.p2Score = 0;
+          this.winScore = 5;
+
+          const trailMap = { short: 2.5, medium: 5.2, long: 9.5 };
+          this.trailDuration = trailMap[settings.trailLength] || 5.2;
+          this.speed = settings.moveSpeed === 'fast' ? 275 : 210;
+        }
+
+        init(w, h) {
+          this.elapsed = 0;
+          this.p1 = {
+            x: w * 0.5,
+            y: h * 0.78,
+            angle: -Math.PI / 2,
+            color: '#00f0ff',
+            trail: []
+          };
+          this.p2 = {
+            x: w * 0.5,
+            y: h * 0.22,
+            angle: Math.PI / 2,
+            color: '#ff2a85',
+            trail: []
+          };
+        }
+
+        resetRound(w, h) {
+          this.init(w, h);
+        }
+
+        rotateToward(current, target, maxStep) {
+          let diff = target - current;
+          while (diff > Math.PI) diff -= Math.PI * 2;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          if (Math.abs(diff) <= maxStep) return target;
+          return current + Math.sign(diff) * maxStep;
+        }
+
+        checkTrailHit(px, py, trail, ignoreRecentSec, hitRadius) {
+          const cutoff = this.elapsed - ignoreRecentSec;
+          for (let i = 0; i < trail.length - 1; i++) {
+            const a = trail[i];
+            const b = trail[i + 1];
+            if (b.t > cutoff) continue;
+
+            const abx = b.x - a.x;
+            const aby = b.y - a.y;
+            const lenSq = abx * abx + aby * aby;
+            let t = 0;
+            if (lenSq > 0.0001) {
+              t = clamp(((px - a.x) * abx + (py - a.y) * aby) / lenSq, 0, 1);
+            }
+            const cx = a.x + abx * t;
+            const cy = a.y + aby * t;
+            if (Math.hypot(px - cx, py - cy) < hitRadius) {
+              return true;
+            }
+          }
+          return false;
+        }
+
+        update(dt, w, h, joystick, onRoundWin) {
+          this.elapsed += dt;
+          const turnRate = 4.6;
+
+          if (joystick.p1.magnitude > 0.12) {
+            const targetAng = Math.atan2(joystick.p1.ny, joystick.p1.nx);
+            this.p1.angle = this.rotateToward(this.p1.angle, targetAng, turnRate * dt);
+          }
+          if (joystick.p2.magnitude > 0.12) {
+            const targetAng = Math.atan2(joystick.p2.ny, joystick.p2.nx);
+            this.p2.angle = this.rotateToward(this.p2.angle, targetAng, turnRate * dt);
+          }
+
+          this.p1.x += Math.cos(this.p1.angle) * this.speed * dt;
+          this.p1.y += Math.sin(this.p1.angle) * this.speed * dt;
+          this.p2.x += Math.cos(this.p2.angle) * this.speed * dt;
+          this.p2.y += Math.sin(this.p2.angle) * this.speed * dt;
+
+          this.p1.trail.push({ x: this.p1.x, y: this.p1.y, t: this.elapsed });
+          this.p2.trail.push({ x: this.p2.x, y: this.p2.y, t: this.elapsed });
+
+          const cutoff = this.elapsed - this.trailDuration;
+          while (this.p1.trail.length > 0 && this.p1.trail[0].t < cutoff) this.p1.trail.shift();
+          while (this.p2.trail.length > 0 && this.p2.trail[0].t < cutoff) this.p2.trail.shift();
+
+          const margin = 12;
+          const hitR = 7.5;
+
+          const p1Wall = this.p1.x < margin || this.p1.x > w - margin || this.p1.y < margin || this.p1.y > h - margin;
+          const p2Wall = this.p2.x < margin || this.p2.x > w - margin || this.p2.y < margin || this.p2.y > h - margin;
+
+          const p1Trail = this.checkTrailHit(this.p1.x, this.p1.y, this.p2.trail, 0, hitR) ||
+                          this.checkTrailHit(this.p1.x, this.p1.y, this.p1.trail, 0.42, hitR);
+          const p2Trail = this.checkTrailHit(this.p2.x, this.p2.y, this.p1.trail, 0, hitR) ||
+                          this.checkTrailHit(this.p2.x, this.p2.y, this.p2.trail, 0.42, hitR);
+
+          const p1Crash = p1Wall || p1Trail;
+          const p2Crash = p2Wall || p2Trail;
+
+          if (p1Crash && p2Crash) {
+            sound.playExplosion();
+            this.vfx.shake(12, 0.28);
+            this.vfx.spawnSparks(this.p1.x, this.p1.y, '#00f0ff', 22, 300);
+            this.vfx.spawnSparks(this.p2.x, this.p2.y, '#ff2a85', 22, 300);
+            this.vfx.spawnBanner('ÇİFTE ÇARPIŞMA!', '#ffbe0b', 1.1);
+            onRoundWin(0);
+          } else if (p1Crash) {
+            this.p2Score++;
+            sound.playExplosion();
+            this.vfx.shake(14, 0.32);
+            this.vfx.spawnSparks(this.p1.x, this.p1.y, '#00f0ff', 34, 380);
+            this.vfx.spawnBanner('ÇARPTI! +1', '#ff2a85', 1.1);
+            onRoundWin(2);
+          } else if (p2Crash) {
+            this.p1Score++;
+            sound.playExplosion();
+            this.vfx.shake(14, 0.32);
+            this.vfx.spawnSparks(this.p2.x, this.p2.y, '#ff2a85', 34, 380);
+            this.vfx.spawnBanner('ÇARPTI! +1', '#00f0ff', 1.1);
+            onRoundWin(1);
+          }
+        }
+
+        render(ctx, w, h) {
+          ctx.save();
+          ctx.strokeStyle = 'rgba(0, 255, 136, 0.28)';
+          ctx.lineWidth = 4;
+          ctx.strokeRect(10, 10, Math.max(10, w - 20), Math.max(10, h - 20));
+          ctx.restore();
+
+          this.drawRibbon(ctx, this.p1);
+          this.drawRibbon(ctx, this.p2);
+          this.drawCycle(ctx, this.p1);
+          this.drawCycle(ctx, this.p2);
+        }
+
+        drawRibbon(ctx, player) {
+          const pts = player.trail;
+          if (pts.length < 2) return;
+
+          ctx.save();
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.strokeStyle = player.color;
+          ctx.shadowColor = player.color;
+          ctx.shadowBlur = 12;
+
+          for (let i = 1; i < pts.length; i++) {
+            const ratio = i / pts.length;
+            ctx.globalAlpha = 0.15 + 0.85 * ratio;
+            ctx.lineWidth = 2 + 5 * ratio;
+            ctx.beginPath();
+            ctx.moveTo(pts[i - 1].x, pts[i - 1].y);
+            ctx.lineTo(pts[i].x, pts[i].y);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+
+        drawCycle(ctx, p) {
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.angle);
+          ctx.fillStyle = '#ffffff';
+          ctx.strokeStyle = p.color;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 16;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(11, 0);
+          ctx.lineTo(-8, -7);
+          ctx.lineTo(-4, 0);
+          ctx.lineTo(-8, 7);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      /* =========================================================================
+       * 9. MINI-GAME 4: FALSOLU PLAZMA TENİSİ (Spin Pong)
+       * ========================================================================= */
+      class SpinPongGame {
+        constructor(settings, vfx) {
+          this.settings = settings;
+          this.vfx = vfx;
+          this.p1Score = 0;
+          this.p2Score = 0;
+          this.winScore = settings.winScore || 5;
+          this.spinMult = settings.spinPower === 'high' ? 1.9 : 1.15;
+        }
+
+        init(w, h, input) {
+          this.paddleW = clamp(w * 0.25, 84, 150);
+          this.paddleH = 16;
+          this.ballR = 11;
+
+          this.p1 = { x: w * 0.5, y: h * 0.84, vx: 0, color: '#00f0ff' };
+          this.p2 = { x: w * 0.5, y: h * 0.16, vx: 0, color: '#ff2a85' };
+          input.p1.x = this.p1.x; input.p1.y = this.p1.y;
+          input.p2.x = this.p2.x; input.p2.y = this.p2.y;
+
+          this.resetBall(w, h, Math.random() < 0.5 ? 1 : -1);
+        }
+
+        resetBall(w, h, dirY) {
+          const ang = (Math.random() * 0.6 - 0.3) + (dirY > 0 ? Math.PI / 2 : -Math.PI / 2);
+          const spd = 410;
+          this.ball = {
+            x: w * 0.5,
+            y: h * 0.5,
+            vx: Math.cos(ang) * spd,
+            vy: Math.sin(ang) * spd,
+            spin: 0,
+            trail: []
+          };
+        }
+
+        resetRound(w, h, scorer) {
+          this.resetBall(w, h, scorer === 1 ? -1 : 1);
+        }
+
+        update(dt, w, h, input, onGoal) {
+          const halfW = this.paddleW * 0.5;
+
+          // P1 moves in 2D inside bottom zone
+          const t1x = clamp(input.p1.x, halfW + 10, w - halfW - 10);
+          const t1y = clamp(input.p1.y, h * 0.58, h - 28);
+          this.p1.vx = (t1x - this.p1.x) / Math.max(0.001, dt);
+          this.p1.x = t1x;
+          this.p1.y = t1y;
+
+          // P2 moves in 2D inside top zone
+          const t2x = clamp(input.p2.x, halfW + 10, w - halfW - 10);
+          const t2y = clamp(input.p2.y, 28, h * 0.42);
+          this.p2.vx = (t2x - this.p2.x) / Math.max(0.001, dt);
+          this.p2.x = t2x;
+          this.p2.y = t2y;
+
+          // Magnus spin curve acceleration
+          this.ball.vx += this.ball.spin * dt;
+          this.ball.spin *= Math.pow(0.992, dt * 60);
+          this.ball.x += this.ball.vx * dt;
+          this.ball.y += this.ball.vy * dt;
+
+          // Side wall bounces
+          if (this.ball.x - this.ballR < 10) {
+            this.ball.x = 10 + this.ballR;
+            this.ball.vx = Math.abs(this.ball.vx);
+            sound.playWall();
+            this.vfx.spawnSparks(10, this.ball.y, '#b829ff', 8, 170);
+          } else if (this.ball.x + this.ballR > w - 10) {
+            this.ball.x = w - 10 - this.ballR;
+            this.ball.vx = -Math.abs(this.ball.vx);
+            sound.playWall();
+            this.vfx.spawnSparks(w - 10, this.ball.y, '#b829ff', 8, 170);
+          }
+
+          // P1 Paddle Hit (moving downward)
+          if (this.ball.vy > 0 &&
+              Math.abs(this.ball.y - this.p1.y) <= this.paddleH * 0.5 + this.ballR &&
+              Math.abs(this.ball.x - this.p1.x) <= halfW + this.ballR) {
+            const offset = (this.ball.x - this.p1.x) / halfW;
+            const currentSpd = Math.min(980, Math.hypot(this.ball.vx, this.ball.vy) * 1.06 + 22);
+            const bounceAngle = -Math.PI / 2 + offset * 0.72;
+            this.ball.vx = Math.cos(bounceAngle) * currentSpd;
+            this.ball.vy = Math.sin(bounceAngle) * currentSpd;
+            this.ball.y = this.p1.y - this.paddleH * 0.5 - this.ballR - 1;
+            this.ball.spin = clamp(this.p1.vx * 0.55 * this.spinMult, -650, 650);
+
+            sound.playHit(0.9);
+            this.vfx.spawnSparks(this.ball.x, this.ball.y, '#00f0ff', 15, 250);
+            if (Math.abs(this.ball.spin) > 260) {
+              this.vfx.spawnRing(this.ball.x, this.ball.y, '#b829ff', 55, 0.25);
+            }
+          }
+
+          // P2 Paddle Hit (moving upward)
+          if (this.ball.vy < 0 &&
+              Math.abs(this.ball.y - this.p2.y) <= this.paddleH * 0.5 + this.ballR &&
+              Math.abs(this.ball.x - this.p2.x) <= halfW + this.ballR) {
+            const offset = (this.ball.x - this.p2.x) / halfW;
+            const currentSpd = Math.min(980, Math.hypot(this.ball.vx, this.ball.vy) * 1.06 + 22);
+            const bounceAngle = Math.PI / 2 - offset * 0.72;
+            this.ball.vx = Math.cos(bounceAngle) * currentSpd;
+            this.ball.vy = Math.sin(bounceAngle) * currentSpd;
+            this.ball.y = this.p2.y + this.paddleH * 0.5 + this.ballR + 1;
+            this.ball.spin = clamp(this.p2.vx * 0.55 * this.spinMult, -650, 650);
+
+            sound.playHit(0.9);
+            this.vfx.spawnSparks(this.ball.x, this.ball.y, '#ff2a85', 15, 250);
+            if (Math.abs(this.ball.spin) > 260) {
+              this.vfx.spawnRing(this.ball.x, this.ball.y, '#b829ff', 55, 0.25);
+            }
+          }
+
+          this.ball.trail.push({ x: this.ball.x, y: this.ball.y, spin: this.ball.spin });
+          if (this.ball.trail.length > 16) this.ball.trail.shift();
+
+          // Out-of-bounds scoring
+          if (this.ball.y < -20) {
+            this.p1Score++;
+            sound.playScore(true);
+            this.vfx.shake(12, 0.28);
+            this.vfx.spawnSparks(this.ball.x, 12, '#00f0ff', 28, 360);
+            this.vfx.spawnBanner('SAYI! 1. OYUNCU', '#00f0ff', 1.1);
+            onGoal(1);
+          } else if (this.ball.y > h + 20) {
+            this.p2Score++;
+            sound.playScore(false);
+            this.vfx.shake(12, 0.28);
+            this.vfx.spawnSparks(this.ball.x, h - 12, '#ff2a85', 28, 360);
+            this.vfx.spawnBanner('SAYI! 2. OYUNCU', '#ff2a85', 1.1);
+            onGoal(2);
+          }
+        }
+
+        render(ctx, w, h) {
+          ctx.save();
+          // Side bounds
+          ctx.strokeStyle = 'rgba(184, 41, 255, 0.25)';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(10, 0); ctx.lineTo(10, h);
+          ctx.moveTo(w - 10, 0); ctx.lineTo(w - 10, h);
+          ctx.stroke();
+
+          // Center net & zone dividers
+          ctx.setLineDash([8, 8]);
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+          ctx.beginPath();
+          ctx.moveTo(10, h * 0.5); ctx.lineTo(w - 10, h * 0.5);
+          ctx.stroke();
+
+          ctx.strokeStyle = 'rgba(0, 240, 255, 0.14)';
+          ctx.beginPath();
+          ctx.moveTo(10, h * 0.58); ctx.lineTo(w - 10, h * 0.58);
+          ctx.stroke();
+
+          ctx.strokeStyle = 'rgba(255, 42, 133, 0.14)';
+          ctx.beginPath();
+          ctx.moveTo(10, h * 0.42); ctx.lineTo(w - 10, h * 0.42);
+          ctx.stroke();
+          ctx.restore();
+
+          // Ball Trail
+          for (let i = 0; i < this.ball.trail.length; i++) {
+            const pt = this.ball.trail[i];
+            const ratio = (i + 1) / this.ball.trail.length;
+            const isCurved = Math.abs(pt.spin) > 150;
+            ctx.save();
+            ctx.fillStyle = isCurved ? `rgba(184, 41, 255, ${ratio * 0.45})` : `rgba(255, 255, 255, ${ratio * 0.28})`;
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, safeR(this.ballR * ratio), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+
+          // Energy Ball
+          ctx.save();
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = Math.abs(this.ball.spin) > 150 ? '#b829ff' : '#00f0ff';
+          ctx.shadowBlur = 20;
+          ctx.beginPath();
+          ctx.arc(this.ball.x, this.ball.y, safeR(this.ballR), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+
+          // Paddles
+          this.drawShield(ctx, this.p1);
+          this.drawShield(ctx, this.p2);
+        }
+
+        drawShield(ctx, p) {
+          const hw = this.paddleW * 0.5;
+          const hh = this.paddleH * 0.5;
+          ctx.save();
+          ctx.fillStyle = p.color;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 18;
+          ctx.beginPath();
+          if (ctx.roundRect) {
+            ctx.roundRect(p.x - hw, p.y - hh, this.paddleW, this.paddleH, 8);
+          } else {
+            ctx.rect(p.x - hw, p.y - hh, this.paddleW, this.paddleH);
+          }
+          ctx.fill();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(p.x - hw * 0.55, p.y - 2, this.paddleW * 0.55, 4);
+          ctx.restore();
+        }
+      }
+
+      /* =========================================================================
+       * 10. MINI-GAME 5: BOYA SAVAŞI (Territory Brawl)
+       * ========================================================================= */
+      class PaintWarGame {
+        constructor(settings, vfx) {
+          this.settings = settings;
+          this.vfx = vfx;
+          this.timeLeft = settings.duration || 30;
+          this.brushR = settings.brushSize === 'large' ? 44 : 28;
+          this.p1Pct = 50;
+          this.p2Pct = 50;
+
+          this.gridW = 108;
+          this.gridH = 192;
+          this.grid = new Uint8Array(this.gridW * this.gridH);
+          this.offCanvas = document.createElement('canvas');
+          this.offCanvas.width = this.gridW;
+          this.offCanvas.height = this.gridH;
+          this.offCtx = this.offCanvas.getContext('2d');
+          this.imgData = this.offCtx.createImageData(this.gridW, this.gridH);
+        }
+
+        init(w, h, input) {
+          this.grid.fill(0);
+          this.p1 = { x: w * 0.5, y: h * 0.78, vx: 0, vy: 0, color: '#00f0ff' };
+          this.p2 = { x: w * 0.5, y: h * 0.22, vx: 0, vy: 0, color: '#ff2a85' };
+          input.p1.x = this.p1.x; input.p1.y = this.p1.y;
+          input.p2.x = this.p2.x; input.p2.y = this.p2.y;
+
+          this.bombs = [];
+          this.bombTimer = 3.2;
+          this.paintCircle(this.p1.x, this.p1.y, this.brushR * 1.4, 1, w, h);
+          this.paintCircle(this.p2.x, this.p2.y, this.brushR * 1.4, 2, w, h);
+          this.refreshTexture();
+        }
+
+        paintCircle(px, py, radiusPx, ownerId, w, h) {
+          const gx = (px / Math.max(1, w)) * this.gridW;
+          const gy = (py / Math.max(1, h)) * this.gridH;
+          const rx = (radiusPx / Math.max(1, w)) * this.gridW;
+          const ry = (radiusPx / Math.max(1, h)) * this.gridH;
+
+          const minX = Math.max(0, Math.floor(gx - rx));
+          const maxX = Math.min(this.gridW - 1, Math.ceil(gx + rx));
+          const minY = Math.max(0, Math.floor(gy - ry));
+          const maxY = Math.min(this.gridH - 1, Math.ceil(gy + ry));
+
+          const invRx2 = 1 / Math.max(0.01, rx * rx);
+          const invRy2 = 1 / Math.max(0.01, ry * ry);
+
+          for (let y = minY; y <= maxY; y++) {
+            const dy2 = (y - gy) * (y - gy) * invRy2;
+            const rowOffset = y * this.gridW;
+            for (let x = minX; x <= maxX; x++) {
+              const dx2 = (x - gx) * (x - gx) * invRx2;
+              if (dx2 + dy2 <= 1.0) {
+                this.grid[rowOffset + x] = ownerId;
+              }
+            }
+          }
+        }
+
+        paintLine(x0, y0, x1, y1, radiusPx, ownerId, w, h) {
+          const dist = Math.hypot(x1 - x0, y1 - y0);
+          const steps = Math.max(1, Math.ceil(dist / 8));
+          for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            this.paintCircle(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, radiusPx, ownerId, w, h);
+          }
+        }
+
+        refreshTexture() {
+          const data = this.imgData.data;
+          let c1 = 0, c2 = 0;
+          const len = this.grid.length;
+
+          for (let i = 0; i < len; i++) {
+            const val = this.grid[i];
+            const idx = i * 4;
+            if (val === 1) {
+              c1++;
+              data[idx] = 0;
+              data[idx + 1] = 240;
+              data[idx + 2] = 255;
+              data[idx + 3] = 145;
+            } else if (val === 2) {
+              c2++;
+              data[idx] = 255;
+              data[idx + 1] = 42;
+              data[idx + 2] = 133;
+              data[idx + 3] = 145;
+            } else {
+              data[idx + 3] = 0;
+            }
+          }
+          this.offCtx.putImageData(this.imgData, 0, 0);
+
+          const totalPainted = c1 + c2;
+          if (totalPainted > 0) {
+            this.p1Pct = Math.round((c1 / totalPainted) * 100);
+            this.p2Pct = 100 - this.p1Pct;
+          } else {
+            this.p1Pct = 50;
+            this.p2Pct = 50;
+          }
+        }
+
+        update(dt, w, h, input, onTimeUp) {
+          this.timeLeft = Math.max(0, this.timeLeft - dt);
+          if (this.timeLeft <= 0) {
+            onTimeUp(this.p1Pct, this.p2Pct);
+            return;
+          }
+
+          const old1X = this.p1.x, old1Y = this.p1.y;
+          const old2X = this.p2.x, old2Y = this.p2.y;
+
+          // Smooth follow anywhere in the arena
+          const lerp = 1 - Math.pow(0.001, dt);
+          this.p1.x += (clamp(input.p1.x, this.brushR, w - this.brushR) - this.p1.x) * lerp;
+          this.p1.y += (clamp(input.p1.y, this.brushR, h - this.brushR) - this.p1.y) * lerp;
+
+          this.p2.x += (clamp(input.p2.x, this.brushR, w - this.brushR) - this.p2.x) * lerp;
+          this.p2.y += (clamp(input.p2.y, this.brushR, h - this.brushR) - this.p2.y) * lerp;
+
+          // Player-to-player bounce collision
+          const dx = this.p2.x - this.p1.x;
+          const dy = this.p2.y - this.p1.y;
+          const dist = Math.hypot(dx, dy);
+          const minDist = this.brushR * 1.9;
+          if (dist < minDist && dist > 0.001) {
+            const nx = dx / dist;
+            const ny = dy / dist;
+            const push = (minDist - dist) * 0.6 + 18;
+            this.p1.x = clamp(this.p1.x - nx * push, this.brushR, w - this.brushR);
+            this.p1.y = clamp(this.p1.y - ny * push, this.brushR, h - this.brushR);
+            this.p2.x = clamp(this.p2.x + nx * push, this.brushR, w - this.brushR);
+            this.p2.y = clamp(this.p2.y + ny * push, this.brushR, h - this.brushR);
+
+            input.p1.x = this.p1.x; input.p1.y = this.p1.y;
+            input.p2.x = this.p2.x; input.p2.y = this.p2.y;
+
+            sound.playHit(0.8);
+            this.vfx.shake(7, 0.16);
+            this.vfx.spawnSparks((this.p1.x + this.p2.x) * 0.5, (this.p1.y + this.p2.y) * 0.5, '#ffffff', 14, 240);
+          }
+
+          this.paintLine(old1X, old1Y, this.p1.x, this.p1.y, this.brushR, 1, w, h);
+          this.paintLine(old2X, old2Y, this.p2.x, this.p2.y, this.brushR, 2, w, h);
+
+          // Paint Bombs
+          this.bombTimer -= dt;
+          if (this.bombTimer <= 0 && this.bombs.length < 2) {
+            this.bombs.push({
+              x: w * (0.18 + Math.random() * 0.64),
+              y: h * (0.18 + Math.random() * 0.64),
+              radius: 18,
+              pulse: 0
+            });
+            this.bombTimer = 4.2;
+          }
+
+          for (let i = this.bombs.length - 1; i >= 0; i--) {
+            const b = this.bombs[i];
+            b.pulse += dt * 6;
+            const d1 = Math.hypot(this.p1.x - b.x, this.p1.y - b.y);
+            const d2 = Math.hypot(this.p2.x - b.x, this.p2.y - b.y);
+            if (d1 < this.brushR + b.radius) {
+              this.detonateBomb(b, 1, '#00f0ff', w, h);
+              this.bombs.splice(i, 1);
+            } else if (d2 < this.brushR + b.radius) {
+              this.detonateBomb(b, 2, '#ff2a85', w, h);
+              this.bombs.splice(i, 1);
+            }
+          }
+
+          this.refreshTexture();
+        }
+
+        detonateBomb(bomb, ownerId, color, w, h) {
+          sound.playExplosion();
+          this.vfx.shake(11, 0.26);
+          this.vfx.spawnRing(bomb.x, bomb.y, color, 145, 0.4);
+          this.vfx.spawnSparks(bomb.x, bomb.y, color, 26, 340);
+          this.paintCircle(bomb.x, bomb.y, Math.min(w, h) * 0.25, ownerId, w, h);
+        }
+
+        render(ctx, w, h) {
+          // Paint canvas layer
+          ctx.save();
+          ctx.imageSmoothingEnabled = true;
+          ctx.drawImage(this.offCanvas, 0, 0, w, h);
+          ctx.restore();
+
+          // Paint Bombs
+          for (const b of this.bombs) {
+            const r = safeR(b.radius + Math.sin(b.pulse) * 3);
+            ctx.save();
+            ctx.fillStyle = 'rgba(255, 190, 11, 0.25)';
+            ctx.strokeStyle = '#ffbe0b';
+            ctx.shadowColor = '#ffbe0b';
+            ctx.shadowBlur = 16;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffbe0b';
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, safeR(6), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+
+          // Brushes
+          this.drawBrush(ctx, this.p1);
+          this.drawBrush(ctx, this.p2);
+
+          // Live Territory Percentage Bar on Left Edge
+          const barX = 12;
+          const barY = h * 0.22;
+          const barH = Math.max(40, h * 0.56);
+          const p2H = barH * (this.p2Pct / 100);
+          const p1H = barH - p2H;
+
+          ctx.save();
+          ctx.fillStyle = '#ff2a85';
+          ctx.fillRect(barX, barY, 6, p2H);
+          ctx.fillStyle = '#00f0ff';
+          ctx.fillRect(barX, barY + p2H, 6, p1H);
+          ctx.restore();
+        }
+
+        drawBrush(ctx, p) {
+          ctx.save();
+          ctx.fillStyle = p.color;
+          ctx.strokeStyle = '#ffffff';
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 18;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, safeR(this.brushR * 0.65), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      /* =========================================================================
+       * 11. MENU UI & CONTEXT-SENSITIVE SETTINGS RENDERING
+       * ========================================================================= */
+      const menuView = document.getElementById('menuView');
+      const gameView = document.getElementById('gameView');
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+
+      const gameCardsContainer = document.getElementById('gameCardsContainer');
+      const startBtn = document.getElementById('startBtn');
+      const startBtnSubtitle = document.getElementById('startBtnSubtitle');
+
+      const soundOnBtn = document.getElementById('soundOnBtn');
+      const soundOffBtn = document.getElementById('soundOffBtn');
+      const volumeSlider = document.getElementById('volumeSlider');
+      const volumeValue = document.getElementById('volumeValue');
+      const volumeRow = document.getElementById('volumeRow');
+
+      const contextSettingsTitle = document.getElementById('contextSettingsTitle');
+      const contextSettingsBadge = document.getElementById('contextSettingsBadge');
+      const contextSettingsContainer = document.getElementById('contextSettingsContainer');
+
+      const inGameMenuBtn = document.getElementById('inGameMenuBtn');
+      const resultModal = document.getElementById('resultModal');
+      const modalTitleP1 = document.getElementById('modalTitleP1');
+      const modalTitleP2 = document.getElementById('modalTitleP2');
+      const modalScoreSummary = document.getElementById('modalScoreSummary');
+      const replayBtn = document.getElementById('replayBtn');
+      const backToMenuBtn = document.getElementById('backToMenuBtn');
+
+      function renderGameCards() {
+        gameCardsContainer.innerHTML = '';
+        GAMES_CATALOG.forEach((game) => {
+          const isSelected = game.id === selectedGameId;
+          const isJoystick = game.controlType === 'Joystick';
+
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'w-full text-left p-3.5 rounded-2xl transition-all flex items-center gap-3.5 cursor-pointer active:scale-[0.99]';
+          card.style.background = isSelected ? 'rgba(15, 23, 42, 0.96)' : 'rgba(15, 23, 42, 0.62)';
+          card.style.border = isSelected ? `1.5px solid ${game.accent}` : '1px solid rgba(255, 255, 255, 0.08)';
+          card.style.boxShadow = isSelected ? `0 0 22px -6px ${game.accent}66` : 'none';
+
+          card.innerHTML = `
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+                 style="background: ${game.accent}18; color: ${game.accent}; border: 1px solid ${game.accent}44;">
+              ${game.iconSvg}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-bold text-sm sm:text-[15px] text-white truncate">${game.title}</span>
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider shrink-0"
+                      style="background: ${isJoystick ? 'rgba(255, 190, 11, 0.16)' : 'rgba(0, 240, 255, 0.12)'};
+                             color: ${isJoystick ? '#ffbe0b' : '#7dd3fc'};
+                             border: 1px solid ${isJoystick ? 'rgba(255, 190, 11, 0.38)' : 'rgba(0, 240, 255, 0.28)'};">
+                  ${game.controlType}
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 truncate mt-0.5">${game.desc}</p>
+            </div>
+            <div class="shrink-0 w-5 h-5 rounded-full flex items-center justify-center border transition-all"
+                 style="border-color: ${isSelected ? game.accent : 'rgba(255,255,255,0.2)'}; background: ${isSelected ? game.accent : 'transparent'};">
+              ${isSelected ? '<svg class="w-3 h-3 text-slate-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
+            </div>
+          `;
+
+          card.addEventListener('click', () => {
+            sound.unlock();
+            sound.playSelect();
+            selectedGameId = game.id;
+            updateMenuUI();
+          });
+
+          gameCardsContainer.appendChild(card);
+        });
+      }
+
+      function renderStartButton() {
+        const game = GAMES_CATALOG.find(g => g.id === selectedGameId) || GAMES_CATALOG[0];
+        startBtn.style.background = game.gradient;
+        startBtn.style.boxShadow = `0 10px 30px -5px ${game.accent}77`;
+        startBtnSubtitle.textContent = `${game.title} • ${game.controlType}`;
+      }
+
+      function renderContextSettings() {
+        const game = GAMES_CATALOG.find(g => g.id === selectedGameId) || GAMES_CATALOG[0];
+        const currentVals = userGameSettings[game.id];
+
+        contextSettingsTitle.textContent = `${game.title} Ayarları`;
+        contextSettingsBadge.style.background = game.accent;
+        contextSettingsBadge.style.boxShadow = `0 0 10px ${game.accent}`;
+
+        contextSettingsContainer.innerHTML = '';
+
+        game.settingsSchema.forEach((setting) => {
+          const row = document.createElement('div');
+          row.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-1';
+
+          const lbl = document.createElement('span');
+          lbl.className = 'text-xs font-semibold text-slate-300';
+          lbl.textContent = setting.label;
+
+          const pills = document.createElement('div');
+          pills.className = 'inline-flex flex-wrap rounded-xl bg-slate-950/90 p-1 border border-white/10 self-start sm:self-auto';
+
+          setting.options.forEach((opt) => {
+            const active = currentVals[setting.key] === opt.value;
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = opt.label;
+            btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer';
+            if (active) {
+              btn.style.background = game.accent;
+              btn.style.color = '#07090f';
+              btn.style.boxShadow = `0 0 12px ${game.accent}66`;
+            } else {
+              btn.className += ' text-slate-400 hover:text-white';
+            }
+
+            btn.addEventListener('click', () => {
+              sound.unlock();
+              sound.playSelect();
+              currentVals[setting.key] = opt.value;
+              renderContextSettings();
+            });
+
+            pills.appendChild(btn);
+          });
+
+          row.appendChild(lbl);
+          row.appendChild(pills);
+          contextSettingsContainer.appendChild(row);
+        });
+      }
+
+      function renderSoundControls() {
+        if (sound.enabled) {
+          soundOnBtn.style.background = '#00f0ff';
+          soundOnBtn.style.color = '#07090f';
+          soundOffBtn.style.background = 'transparent';
+          soundOffBtn.style.color = '#94a3b8';
+          volumeRow.style.opacity = '1';
+          volumeRow.style.pointerEvents = 'auto';
+        } else {
+          soundOffBtn.style.background = '#ff2a85';
+          soundOffBtn.style.color = '#ffffff';
+          soundOnBtn.style.background = 'transparent';
+          soundOnBtn.style.color = '#94a3b8';
+          volumeRow.style.opacity = '0.4';
+          volumeRow.style.pointerEvents = 'none';
+        }
+      }
+
+      function updateMenuUI() {
+        renderGameCards();
+        renderStartButton();
+        renderContextSettings();
+        renderSoundControls();
+      }
+
+      soundOnBtn.addEventListener('click', () => {
+        sound.enabled = true;
+        sound.unlock();
+        sound.playSelect();
+        renderSoundControls();
+      });
+
+      soundOffBtn.addEventListener('click', () => {
+        sound.enabled = false;
+        renderSoundControls();
+      });
+
+      volumeSlider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10) || 0;
+        sound.volume = val / 100;
+        volumeValue.textContent = `%${val}`;
+      });
+
+      /* =========================================================================
+       * 12. GAME LOOP, CANVAS SIZING & LIFECYCLE CONTROLLER (ZERO BLACK SCREEN)
+       * ========================================================================= */
+      const directTouch = new DirectTouchController(canvas);
+      const joystickCtrl = new VirtualJoystickController(canvas);
+      const vfx = new VisualEffects();
+
+      let canvasW = 360;
+      let canvasH = 640;
+      let gameState = 'menu'; // 'menu' | 'countdown' | 'playing' | 'roundPause' | 'gameover'
+      let activeEngine = null;
+      let animFrameId = null;
+      let lastFrameTime = 0;
+
+      let countdownTimer = 0;
+      let lastCountdownNum = 4;
+      let roundPauseTimer = 0;
+      let pendingRoundCb = null;
+
+      function measureAndResizeCanvas() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = gameView.clientWidth || window.innerWidth || 360;
+        const h = gameView.clientHeight || window.innerHeight || 640;
+
+        canvasW = Math.max(240, w);
+        canvasH = Math.max(320, h);
+
+        canvas.width = Math.floor(canvasW * dpr);
+        canvas.height = Math.floor(canvasH * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        if (joystickCtrl) {
+          joystickCtrl.layout(canvasW, canvasH);
+        }
+      }
+
+      if (typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(() => {
+          if (gameState !== 'menu') {
+            measureAndResizeCanvas();
+          }
+        });
+        ro.observe(gameView);
+      }
+      window.addEventListener('resize', () => {
+        if (gameState !== 'menu') {
+          measureAndResizeCanvas();
+        }
+      });
+
+      function createEngine() {
+        const s = userGameSettings[selectedGameId];
+        if (selectedGameId === 'airhockey') return new AirHockeyGame(s, vfx);
+        if (selectedGameId === 'sumo') return new SumoGame(s, vfx);
+        if (selectedGameId === 'tron') return new TronGame(s, vfx);
+        if (selectedGameId === 'pong') return new SpinPongGame(s, vfx);
+        return new PaintWarGame(s, vfx);
+      }
+
+      function startMatch() {
+        try {
+          sound.unlock();
+          sound.playSelect();
+
+          // Stop any existing loop first
+          if (animFrameId) {
+            cancelAnimationFrame(animFrameId);
+            animFrameId = null;
+          }
+
+          // 1. Make game container visible FIRST so clientWidth/clientHeight are non-zero!
+          menuView.classList.add('hidden');
+          gameView.classList.remove('hidden');
+          gameView.classList.add('flex');
+          resultModal.classList.add('hidden');
+          resultModal.classList.remove('flex');
+          document.body.classList.add('in-game');
+
+          // 2. Measure canvas safely
+          measureAndResizeCanvas();
+          vfx.clear();
+
+          // 3. Configure Input Controllers
+          const isJoystick = selectedGameId === 'sumo' || selectedGameId === 'tron';
+          const settings = userGameSettings[selectedGameId];
+
+          directTouch.configure(!isJoystick, selectedGameId === 'paint', canvasW, canvasH);
+          joystickCtrl.configure(
+            isJoystick,
+            settings.joystickType || 'fixed',
+            selectedGameId === 'sumo',
+            canvasW,
+            canvasH,
+            (playerNum) => {
+              if (selectedGameId === 'sumo' && activeEngine && gameState === 'playing') {
+                activeEngine.triggerShock(playerNum, joystickCtrl);
+              }
+            }
+          );
+
+          // 4. Initialize Selected Game Engine
+          activeEngine = createEngine();
+          activeEngine.init(canvasW, canvasH, directTouch);
+
+          gameState = 'countdown';
+          countdownTimer = 2.4;
+          lastCountdownNum = 4;
+          lastFrameTime = performance.now();
+
+          animFrameId = requestAnimationFrame(gameLoop);
+        } catch (err) {
+          console.error('Oyun başlatma hatası:', err);
+          returnToMenu();
+        }
+      }
+
+      function returnToMenu() {
+        if (animFrameId) {
+          cancelAnimationFrame(animFrameId);
+          animFrameId = null;
+        }
+        gameState = 'menu';
+        activeEngine = null;
+        directTouch.enabled = false;
+        joystickCtrl.enabled = false;
+
+        document.body.classList.remove('in-game');
+        resultModal.classList.add('hidden');
+        resultModal.classList.remove('flex');
+        gameView.classList.add('hidden');
+        gameView.classList.remove('flex');
+        menuView.classList.remove('hidden');
+      }
+
+      function scheduleNextRound(cb) {
+        gameState = 'roundPause';
+        roundPauseTimer = 0.95;
+        pendingRoundCb = cb;
+      }
+
+      function finishMatch(p1Headline, summaryText, p2Headline) {
+        gameState = 'gameover';
+        modalTitleP1.textContent = p1Headline;
+        modalTitleP2.textContent = p2Headline;
+        modalScoreSummary.textContent = summaryText;
+        resultModal.classList.remove('hidden');
+        resultModal.classList.add('flex');
+      }
+
+      function drawDualHUD() {
+        if (!activeEngine) return;
+        ctx.save();
+
+        if (selectedGameId === 'paint') {
+          const secs = Math.ceil(activeEngine.timeLeft);
+          ctx.font = '900 22px Orbitron, sans-serif';
+          ctx.textBaseline = 'middle';
+
+          // Bottom Player (P1 - Cyan)
+          ctx.fillStyle = '#00f0ff';
+          ctx.textAlign = 'right';
+          ctx.fillText(`%${activeEngine.p1Pct}  •  ${secs}sn`, canvasW - 22, canvasH - 24);
+
+          // Top Player (P2 - Pink, rotated 180deg)
+          ctx.save();
+          ctx.translate(canvasW - 22, 24);
+          ctx.rotate(Math.PI);
+          ctx.fillStyle = '#ff2a85';
+          ctx.textAlign = 'left';
+          ctx.fillText(`%${activeEngine.p2Pct}  •  ${secs}sn`, 0, 0);
+          ctx.restore();
+        } else {
+          const p1S = activeEngine.p1Score || 0;
+          const p2S = activeEngine.p2Score || 0;
+
+          ctx.font = '900 32px Orbitron, sans-serif';
+          ctx.textBaseline = 'middle';
+
+          // P1 Score (Bottom-Right)
+          ctx.fillStyle = 'rgba(0, 240, 255, 0.72)';
+          ctx.textAlign = 'right';
+          ctx.fillText(`${p1S}`, canvasW - 20, canvasH * 0.5 + 36);
+
+          // P2 Score (Top-Right, rotated 180deg)
+          ctx.save();
+          ctx.translate(canvasW - 20, canvasH * 0.5 - 36);
+          ctx.rotate(Math.PI);
+          ctx.fillStyle = 'rgba(255, 42, 133, 0.72)';
+          ctx.textAlign = 'left';
+          ctx.fillText(`${p2S}`, 0, 0);
+          ctx.restore();
+        }
+
+        // Countdown Banner ("3, 2, 1, BAŞLA!")
+        if (gameState === 'countdown') {
+          const num = Math.ceil(countdownTimer);
+          const label = num > 0 ? `${num}` : 'BAŞLA!';
+
+          ctx.fillStyle = 'rgba(7, 9, 15, 0.45)';
+          ctx.fillRect(0, 0, canvasW, canvasH);
+
+          ctx.font = '900 50px Orbitron, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = '#00f0ff';
+          ctx.shadowBlur = 22;
+
+          ctx.fillText(label, canvasW * 0.5, canvasH * 0.5 + 54);
+
+          ctx.save();
+          ctx.translate(canvasW * 0.5, canvasH * 0.5 - 54);
+          ctx.rotate(Math.PI);
+          ctx.shadowColor = '#ff2a85';
+          ctx.fillText(label, 0, 0);
+          ctx.restore();
+        }
+
+        ctx.restore();
+      }
+
+      function gameLoop(now) {
+        if (gameState === 'menu' || !activeEngine) return;
+        animFrameId = requestAnimationFrame(gameLoop);
+
+        try {
+          const dt = clamp((now - lastFrameTime) / 1000, 0.001, 0.033);
+          lastFrameTime = now;
+
+          if (gameState === 'countdown') {
+            countdownTimer -= dt;
+            const cInt = Math.ceil(countdownTimer);
+            if (cInt < lastCountdownNum && cInt >= 1) {
+              lastCountdownNum = cInt;
+              sound.playCountdown(false);
+            }
+            if (countdownTimer <= 0) {
+              sound.playCountdown(true);
+              gameState = 'playing';
+            }
+          } else if (gameState === 'roundPause') {
+            roundPauseTimer -= dt;
+            vfx.update(dt);
+            if (roundPauseTimer <= 0) {
+              if (pendingRoundCb) pendingRoundCb();
+              pendingRoundCb = null;
+              gameState = 'playing';
+            }
+          } else if (gameState === 'playing') {
+            directTouch.step(dt);
+            joystickCtrl.step(dt);
+            vfx.update(dt);
+
+            if (selectedGameId === 'airhockey') {
+              activeEngine.update(dt, canvasW, canvasH, directTouch, (scorer) => {
+                if (activeEngine.p1Score >= activeEngine.winScore) {
+                  finishMatch('1. OYUNCU KAZANDI!', `Skor: ${activeEngine.p1Score} - ${activeEngine.p2Score}`, '1. OYUNCU KAZANDI!');
+                } else if (activeEngine.p2Score >= activeEngine.winScore) {
+                  finishMatch('2. OYUNCU KAZANDI!', `Skor: ${activeEngine.p2Score} - ${activeEngine.p1Score}`, '2. OYUNCU KAZANDI!');
+                } else {
+                  scheduleNextRound(() => activeEngine.resetRound(canvasW, canvasH, scorer));
+                }
+              });
+            } else if (selectedGameId === 'sumo') {
+              activeEngine.update(dt, canvasW, canvasH, joystickCtrl, () => {
+                if (activeEngine.p1Score >= activeEngine.winScore) {
+                  finishMatch('1. OYUNCU KAZANDI!', `Skor: ${activeEngine.p1Score} - ${activeEngine.p2Score}`, '1. OYUNCU KAZANDI!');
+                } else if (activeEngine.p2Score >= activeEngine.winScore) {
+                  finishMatch('2. OYUNCU KAZANDI!', `Skor: ${activeEngine.p2Score} - ${activeEngine.p1Score}`, '2. OYUNCU KAZANDI!');
+                } else {
+                  scheduleNextRound(() => activeEngine.resetRound(canvasW, canvasH));
+                }
+              });
+            } else if (selectedGameId === 'tron') {
+              activeEngine.update(dt, canvasW, canvasH, joystickCtrl, () => {
+                if (activeEngine.p1Score >= activeEngine.winScore) {
+                  finishMatch('1. OYUNCU KAZANDI!', `Skor: ${activeEngine.p1Score} - ${activeEngine.p2Score}`, '1. OYUNCU KAZANDI!');
+                } else if (activeEngine.p2Score >= activeEngine.winScore) {
+                  finishMatch('2. OYUNCU KAZANDI!', `Skor: ${activeEngine.p2Score} - ${activeEngine.p1Score}`, '2. OYUNCU KAZANDI!');
+                } else {
+                  scheduleNextRound(() => activeEngine.resetRound(canvasW, canvasH));
+                }
+              });
+            } else if (selectedGameId === 'pong') {
+              activeEngine.update(dt, canvasW, canvasH, directTouch, (scorer) => {
+                if (activeEngine.p1Score >= activeEngine.winScore) {
+                  finishMatch('1. OYUNCU KAZANDI!', `Skor: ${activeEngine.p1Score} - ${activeEngine.p2Score}`, '1. OYUNCU KAZANDI!');
+                } else if (activeEngine.p2Score >= activeEngine.winScore) {
+                  finishMatch('2. OYUNCU KAZANDI!', `Skor: ${activeEngine.p2Score} - ${activeEngine.p1Score}`, '2. OYUNCU KAZANDI!');
+                } else {
+                  scheduleNextRound(() => activeEngine.resetRound(canvasW, canvasH, scorer));
+                }
+              });
+            } else if (selectedGameId === 'paint') {
+              activeEngine.update(dt, canvasW, canvasH, directTouch, (p1Pct, p2Pct) => {
+                if (p1Pct > p2Pct) {
+                  finishMatch('1. OYUNCU KAZANDI!', `Alan Hakimiyeti: %${p1Pct} - %${p2Pct}`, '1. OYUNCU KAZANDI!');
+                } else if (p2Pct > p1Pct) {
+                  finishMatch('2. OYUNCU KAZANDI!', `Alan Hakimiyeti: %${p2Pct} - %${p1Pct}`, '2. OYUNCU KAZANDI!');
+                } else {
+                  finishMatch('BERABERE!', `Alan Hakimiyeti: %${p1Pct} - %${p2Pct}`, 'BERABERE!');
+                }
+              });
+            }
+          }
+
+          // Clear & Render Frame
+          ctx.save();
+          ctx.fillStyle = '#07090f';
+          ctx.fillRect(0, 0, canvasW, canvasH);
+          vfx.applyShake(ctx);
+
+          activeEngine.render(ctx, canvasW, canvasH);
+          vfx.render(ctx, canvasW, canvasH);
+          ctx.restore();
+
+          joystickCtrl.render(ctx);
+          drawDualHUD();
+        } catch (frameErr) {
+          console.error('Kare çizim hatası:', frameErr);
+        }
+      }
+
+      // Wire Menu & Overlay Buttons
+      startBtn.addEventListener('click', startMatch);
+      inGameMenuBtn.addEventListener('click', returnToMenu);
+      replayBtn.addEventListener('click', startMatch);
+      backToMenuBtn.addEventListener('click', returnToMenu);
+
+      // Initial Menu Boot
+      updateMenuUI();
+    })();
+  </script>
+</body>
+</html>
