@@ -3,9 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#07090f" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="DUO ARENA" />
   <title>DUO ARENA - 2 Kişilik &amp; Yapay Zeka Arena</title>
+
+  <!-- Ana ekran ve sekme ikonu (Gamepad + altlı üstlü DUO / ARENA logosu otomatik atanır) -->
+  <link id="appAppleIcon" rel="apple-touch-icon" sizes="180x180" href="" />
+  <link id="appFavicon" rel="icon" type="image/png" href="" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -878,6 +885,154 @@
       'use strict';
 
       /* =========================================================================
+       * HOME SCREEN APP ICON GENERATOR (GAMEPAD + STACKED DUO / ARENA LOGO)
+       * ========================================================================= */
+      (function generateDuoArenaHomeIcon() {
+        function renderIcon() {
+          const size = 512;
+          const canvas = document.createElement('canvas');
+          canvas.width = size;
+          canvas.height = size;
+          const c = canvas.getContext('2d');
+          if (!c) return;
+
+          // 1) Koyu Arena Arka Planı & Neon Işıltılar
+          const bg = c.createLinearGradient(0, 0, size, size);
+          bg.addColorStop(0, '#0b1428');
+          bg.addColorStop(0.5, '#07090f');
+          bg.addColorStop(1, '#180824');
+          c.fillStyle = bg;
+          c.fillRect(0, 0, size, size);
+
+          // Sol üst Cyan (P1) parıltısı
+          const g1 = c.createRadialGradient(130, 130, 10, 130, 130, 260);
+          g1.addColorStop(0, 'rgba(0, 240, 255, 0.28)');
+          g1.addColorStop(1, 'rgba(0, 240, 255, 0)');
+          c.fillStyle = g1;
+          c.fillRect(0, 0, size, size);
+
+          // Sağ alt Pembe/Magenta (P2) parıltısı
+          const g2 = c.createRadialGradient(382, 382, 10, 382, 382, 260);
+          g2.addColorStop(0, 'rgba(255, 42, 133, 0.28)');
+          g2.addColorStop(1, 'rgba(255, 42, 133, 0)');
+          c.fillStyle = g2;
+          c.fillRect(0, 0, size, size);
+
+          // İnce arena ızgara çizgileri
+          c.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+          c.lineWidth = 2;
+          for (let i = 64; i < size; i += 64) {
+            c.beginPath(); c.moveTo(i, 0); c.lineTo(i, size); c.stroke();
+            c.beginPath(); c.moveTo(0, i); c.lineTo(size, i); c.stroke();
+          }
+
+          // 2) Üst Kısımda Neon Gamepad İkonu
+          c.save();
+          c.translate(size / 2, 142);
+
+          const padGrad = c.createLinearGradient(-115, -55, 115, 55);
+          padGrad.addColorStop(0, '#00f0ff');
+          padGrad.addColorStop(0.5, '#38bdf8');
+          padGrad.addColorStop(1, '#ff2a85');
+
+          c.shadowColor = 'rgba(0, 240, 255, 0.65)';
+          c.shadowBlur = 22;
+          c.fillStyle = 'rgba(15, 23, 42, 0.92)';
+          c.strokeStyle = padGrad;
+          c.lineWidth = 7;
+
+          // Gamepad gövde silüeti
+          c.beginPath();
+          c.moveTo(-64, -44);
+          c.lineTo(64, -44);
+          c.bezierCurveTo(106, -44, 124, -14, 116, 36);
+          c.bezierCurveTo(111, 64, 86, 68, 70, 44);
+          c.lineTo(50, 18);
+          c.lineTo(-50, 18);
+          c.lineTo(-70, 44);
+          c.bezierCurveTo(-86, 68, -111, 64, -116, 36);
+          c.bezierCurveTo(-124, -14, -106, -44, -64, -44);
+          c.closePath();
+          c.fill();
+          c.stroke();
+
+          // Sol D-Pad (Cyan - 1. Oyuncu)
+          c.shadowBlur = 10;
+          c.shadowColor = '#00f0ff';
+          c.fillStyle = '#00f0ff';
+          c.fillRect(-74, -12, 32, 10);
+          c.fillRect(-63, -23, 10, 32);
+
+          // Sağ Aksiyon Tuşları (Pembe & Altın - 2. Oyuncu)
+          c.shadowColor = '#ff2a85';
+          c.fillStyle = '#ff2a85';
+          c.beginPath(); c.arc(64, -18, 7, 0, Math.PI * 2); c.fill();
+          c.beginPath(); c.arc(64, 4, 7, 0, Math.PI * 2); c.fill();
+          c.fillStyle = '#38bdf8';
+          c.beginPath(); c.arc(52, -7, 7, 0, Math.PI * 2); c.fill();
+          c.fillStyle = '#ffbe0b';
+          c.beginPath(); c.arc(76, -7, 7, 0, Math.PI * 2); c.fill();
+
+          // Orta Menü Çizgileri
+          c.shadowBlur = 0;
+          c.fillStyle = 'rgba(255, 255, 255, 0.55)';
+          c.fillRect(-14, -11, 10, 4);
+          c.fillRect(4, -11, 10, 4);
+          c.restore();
+
+          // 3) Altlı Üstlü "DUO" ve "ARENA" Yazısı
+          c.save();
+          c.textAlign = 'center';
+          c.textBaseline = 'middle';
+
+          // Üst Satır: DUO
+          const duoGrad = c.createLinearGradient(120, 240, 392, 320);
+          duoGrad.addColorStop(0, '#00f0ff');
+          duoGrad.addColorStop(0.5, '#ffffff');
+          duoGrad.addColorStop(1, '#38bdf8');
+
+          c.font = '900 108px Orbitron, "Arial Black", sans-serif';
+          c.shadowColor = 'rgba(0, 240, 255, 0.65)';
+          c.shadowBlur = 24;
+          c.fillStyle = duoGrad;
+          c.fillText('DUO', size / 2, 294);
+
+          // İki kelime arası ince neon ayırıcı çizgi
+          const divGrad = c.createLinearGradient(110, 354, 402, 354);
+          divGrad.addColorStop(0, 'rgba(0, 240, 255, 0)');
+          divGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.45)');
+          divGrad.addColorStop(1, 'rgba(255, 42, 133, 0)');
+          c.shadowBlur = 0;
+          c.fillStyle = divGrad;
+          c.fillRect(110, 352, 292, 3);
+
+          // Alt Satır: ARENA
+          const arenaGrad = c.createLinearGradient(90, 380, 422, 450);
+          arenaGrad.addColorStop(0, '#38bdf8');
+          arenaGrad.addColorStop(0.5, '#f8fafc');
+          arenaGrad.addColorStop(1, '#ff2a85');
+
+          c.font = '900 76px Orbitron, "Arial Black", sans-serif';
+          c.shadowColor = 'rgba(255, 42, 133, 0.65)';
+          c.shadowBlur = 22;
+          c.fillStyle = arenaGrad;
+          c.fillText('ARENA', size / 2, 414);
+          c.restore();
+
+          const dataUrl = canvas.toDataURL('image/png');
+          const appleIcon = document.getElementById('appAppleIcon');
+          const favIcon = document.getElementById('appFavicon');
+          if (appleIcon) appleIcon.href = dataUrl;
+          if (favIcon) favIcon.href = dataUrl;
+        }
+
+        renderIcon();
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(renderIcon).catch(() => {});
+        }
+      })();
+
+      /* =========================================================================
        * 0. STRICT ANTI-SELECTION, ANTI-MAGNIFIER & ANTI-ZOOM GUARD
        * ========================================================================= */
       document.addEventListener('selectstart', (e) => e.preventDefault());
@@ -1094,7 +1249,7 @@
         fr: {
           p1Short: 'Joueur 1', p2Short: 'Joueur 2', botShort: 'Bot (IA)', headerSub: 'Arène Multitactile 2 Joueurs & IA',
           settings: 'Paramètres', controlCenter: 'Centre de Contrôle du Jeu', opponentMode: 'Mode', twoPlayer: '2 Joueurs', vsBot: 'Contre Bot',
-          botDifficulty: 'Niveau:', diff_easy: 'Facile', diff_medium: 'Moyen', diff_hard: 'Difficile', diff_expert: 'Expert', diff_impossible: 'Impossible',
+          botDifficulty: 'Niveau:', diff_easy: 'Facile', diff_medium: 'Moyen', diff_hard: 'Difícil', diff_expert: 'Expert', diff_impossible: 'Impossible',
           activeGameTag: 'Jeu Sélectionné', selectGameBtn: 'Choisir un Jeu', gamesCount: '5 Jeux • 60 Thèmes',
           gameSelectTag: '5 Mini-Jeux', gameSelectTitle: 'Choisir un Jeu', start: 'JOUER', bottomSide: 'Bas:', topSide: 'Haut:',
           langTitle: 'Langue (18 Langues)', appThemeTitle: 'Thème App (14 Clairs & Sombres)',
@@ -1376,7 +1531,6 @@
         ctx.translate(x, y);
 
         if (visualStyle === 'comic_cel') {
-          // 3. COMIC CEL: Hard offset drop shadow, bold black ink border, flat vibrant fill, white specular slash
           ctx.save();
           ctx.translate(4, 5);
           ctx.fillStyle = '#000000';
@@ -1391,7 +1545,6 @@
           ctx.fill();
           ctx.stroke();
 
-          // Comic white specular highlight
           ctx.strokeStyle = '#ffffff';
           ctx.lineWidth = 3;
           ctx.lineCap = 'round';
@@ -1399,7 +1552,6 @@
           ctx.arc(0, 0, safeR(r * 0.65), -Math.PI * 0.8, -Math.PI * 0.35);
           ctx.stroke();
         } else if (visualStyle === 'blueprint_cad') {
-          // 4. BLUEPRINT CAD: Architectural drafting crosshairs, dashed dimension ring, crisp white/cyan lines
           ctx.strokeStyle = 'rgba(255,255,255,0.6)';
           ctx.lineWidth = 1;
           ctx.setLineDash([4, 3]);
@@ -1425,7 +1577,6 @@
           ctx.arc(0, 0, safeR(r * 0.25), 0, Math.PI * 2);
           ctx.fill();
         } else if (visualStyle === 'crystal_glass') {
-          // 5. CRYSTAL PRISM: Faceted ice/glass gradient, sharp specular wedge & diamond internal lines
           const grad = ctx.createLinearGradient(-r, -r, r, r);
           grad.addColorStop(0, '#ffffffcc');
           grad.addColorStop(0.35, rgba(mainColor, 0.55));
@@ -1447,7 +1598,6 @@
           drawPolygonPath(ctx, 4, r * 0.65, Math.PI / 4);
           ctx.stroke();
         } else if (visualStyle === 'wireframe_laser') {
-          // 6. WIREFRAME LASER: Hollow glowing vector triangles & double laser rings, zero fill
           ctx.shadowColor = mainColor;
           ctx.shadowBlur = 14;
           ctx.strokeStyle = mainColor;
@@ -1462,7 +1612,6 @@
           drawPolygonPath(ctx, 3, r * 0.72, -time * 2.4 + Math.PI);
           ctx.stroke();
         } else if (visualStyle === 'liquid_magma') {
-          // 7. LIQUID MAGMA & PLASMA: Pulsating molten aura rings & blazing white-hot core
           const pulse = 1 + 0.14 * Math.sin(time * 8);
           ctx.fillStyle = rgba(mainColor, 0.22);
           ctx.beginPath();
@@ -1481,7 +1630,6 @@
           drawShapeGeometry(ctx, shape, r, angle, time);
           ctx.fill();
         } else if (visualStyle === 'cyber_matrix') {
-          // 8. CYBER MATRIX: Segmented rotating data arcs & digital core
           ctx.strokeStyle = mainColor;
           ctx.lineWidth = 3;
           ctx.setLineDash([8, 5]);
@@ -1500,7 +1648,6 @@
           ctx.fillStyle = mainColor;
           ctx.fillRect(-r * 0.28, -r * 0.28, r * 0.56, r * 0.56);
         } else if (visualStyle === 'minimal_flat') {
-          // 9. MODERN MINIMAL: Clean solid matte geometry, crisp white inner dot, zero glow
           ctx.fillStyle = mainColor;
           drawShapeGeometry(ctx, shape, r, angle, time);
           ctx.fill();
@@ -1510,7 +1657,6 @@
           ctx.arc(0, 0, safeR(r * 0.34), 0, Math.PI * 2);
           ctx.fill();
         } else if (visualStyle === 'retro_crt') {
-          // 2. RETRO ARCADE 80s: Stepped double pixel-style ring & bright phosphor core
           ctx.fillStyle = rgba(mainColor, 0.35);
           ctx.strokeStyle = mainColor;
           ctx.lineWidth = 3.5;
@@ -1521,7 +1667,6 @@
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(-r * 0.32, -r * 0.32, r * 0.64, r * 0.64);
         } else {
-          // 1. NEON BLOOM (Default): Intense outer glow + luminous center
           ctx.fillStyle = rgba(mainColor, 0.28);
           ctx.strokeStyle = mainColor;
           ctx.shadowColor = mainColor;
@@ -1537,7 +1682,6 @@
           ctx.fill();
         }
 
-        // Extra shape-specific detail overlays
         if (shape === 'drone_cross') {
           for (let k = 0; k < 4; k++) {
             const a = time * 1.8 + (k * Math.PI) / 2;
@@ -1581,7 +1725,6 @@
         if (visualStyle === 'comic_cel') {
           ctx.fillStyle = theme.bg;
           ctx.fillRect(0, 0, w, h);
-          // Halftone comic dots
           ctx.fillStyle = rgba(theme.line, 0.12);
           for (let gx = 12; gx < w; gx += 22) {
             for (let gy = 12; gy < h; gy += 22) {
@@ -2449,7 +2592,7 @@
       }
 
       /* =========================================================================
-       * 9. UPGRADED AI BOT BRAIN (ANTI-STALL, PROACTIVE STRIKES & FULL COVERAGE)
+       * 9. UPGRADED AI BOT BRAIN
        * ========================================================================= */
       class ArenaBotAI {
         constructor() { this.timer = 0; this.noiseX = 0; this.noiseY = 0; }
@@ -2472,7 +2615,6 @@
         }
 
         thinkAirHockey(dt, engine, w, h, directTouch, diff) {
-          // Pick the puck most threatening or closest to bot's half
           let targetPuck = engine.pucks[0];
           for (const pk of engine.pucks) {
             if (!targetPuck || pk.y < targetPuck.y) targetPuck = pk;
@@ -2486,15 +2628,12 @@
             const predY = targetPuck.y + targetPuck.vy * 0.14 * diff.predictLead;
             const puckSpeed = Math.hypot(targetPuck.vx, targetPuck.vy);
 
-            // Puck is in bot's half (or right at center line): ALWAYS charge & strike!
             if (targetPuck.y <= h * 0.52) {
               if (targetPuck.y < 58) {
-                // Near top wall: sweep laterally from the side so bot never traps puck into own goal
                 const sideDir = targetPuck.x < w * 0.5 ? 1 : -1;
                 tx = clamp(targetPuck.x + sideDir * 14, 38, w - 38);
                 ty = Math.max(46, targetPuck.y + 10);
               } else if (puckSpeed < 135) {
-                // Slow or stationary puck in upper half: smash directly through puck center toward P1 goal!
                 const goalX = w * 0.5 + this.noiseX * 0.4;
                 const goalY = h;
                 const dxG = goalX - targetPuck.x;
@@ -2503,16 +2642,13 @@
                 tx = targetPuck.x + (dxG / lenG) * 28;
                 ty = clamp(targetPuck.y + (dyG / lenG) * 28, 38, h * 0.48);
               } else {
-                // Moving puck in upper half: intercept & drive through it toward bottom half
                 const dxGoal = (w * 0.5 + this.noiseX * 0.4) - predX;
                 const dyGoal = h - predY;
                 const len = Math.hypot(dxGoal, dyGoal) || 1;
-                // Aim slightly ahead through the puck to guarantee contact
                 tx = clamp(predX + (dxGoal / len) * 14, 36, w - 36);
                 ty = clamp(predY + (dyGoal / len) * 14, 38, h * 0.48);
               }
             } else {
-              // Puck is in bottom half: track X smoothly and stay ready at defensive arc
               tx = clamp(predX + this.noiseX * 0.7, w * 0.22, w * 0.78);
               ty = h * 0.14 + this.noiseY * 0.25;
             }
@@ -2534,7 +2670,6 @@
           const hitPlaneY = h * 0.16;
           let predX = ball.x;
 
-          // Predict exact X where ball crosses bot's hitting plane (with wall bounce reflection)
           if (ball.vy < -10) {
             const timeToPlane = clamp((hitPlaneY - ball.y) / ball.vy, 0, 1.4);
             let rawX = ball.x + (ball.vx + ball.spin * 0.25 * timeToPlane) * timeToPlane;
@@ -2552,10 +2687,8 @@
           let tx = clamp(predX + this.noiseX * 0.55, 48, w - 48);
           let ty = hitPlaneY;
 
-          // When ball is in upper half, step forward to meet & strike it cleanly (even if slow!)
           if (ball.y < h * 0.46) {
             ty = clamp(ball.y - 6, 32, h * 0.38);
-            // Add lateral swipe motion at impact to apply curve spin
             if (Math.abs(ball.y - directTouch.p2.y) < 36) {
               tx = clamp(tx + Math.sin(engine.elapsed * 11) * (24 * diff.speedMult), 44, w - 44);
             }
@@ -3274,373 +3407,1194 @@
           const shape = this.settings.vehicleShape || 'diamond_prism';
           renderArenaBackdrop(ctx, w, h, theme, visualStyle, this.elapsed);
 
-          ctx.save(); ctx.strokeStyle = rgba(theme.line, 0.3); ctx.lineWidth = 3;
-          ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(10, h); ctx.moveTo(w - 10, 0); ctx.lineTo(w - 10, h); ctx.stroke();
-          ctx.setLineDash([8, 8]); ctx.strokeStyle = rgba(theme.line, 0.18);
-          ctx.beginPath(); ctx.moveTo(10, h * 0.5); ctx.lineTo(w - 10, h * 0.5); ctx.stroke();
-          ctx.restore();
+          ctx.save(); ctx.strokeStyle = rgba(theme.line, 0.3); ctx.lineWidth = 4;
+          ctx.strokeRect(10, 10, Math.max(10, w - 20), Math.max(10, h - 20));
+          ctx.setLineDash([8, 8]); ctx.strokeStyle = rgba(theme.line, 0.24); ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(10, h * 0.5); ctx.lineTo(w - 10, h * 0.5); ctx.stroke(); ctx.restore();
 
           for (let i = 0; i < this.ball.trail.length; i++) {
             const pt = this.ball.trail[i]; const ratio = (i + 1) / this.ball.trail.length;
-            ctx.save(); ctx.fillStyle = Math.abs(pt.spin) > 150 ? rgba(theme.accent, ratio * 0.45) : rgba('#ffffff', ratio * 0.28);
+            const c = Math.abs(pt.spin) > 120 ? theme.accent : theme.line;
+            ctx.save(); ctx.fillStyle = rgba(c, ratio * 0.30);
             ctx.beginPath(); ctx.arc(pt.x, pt.y, safeR(this.ballR * ratio), 0, Math.PI * 2); ctx.fill(); ctx.restore();
           }
 
-          ctx.save(); ctx.fillStyle = '#ffffff'; ctx.shadowColor = theme.accent; ctx.shadowBlur = visualStyle === 'minimal_flat' ? 0 : 20;
+          ctx.save();
+          ctx.fillStyle = Math.abs(this.ball.spin) > 120 ? theme.accent : '#ffffff';
+          ctx.shadowColor = theme.accent; ctx.shadowBlur = visualStyle === 'minimal_flat' ? 0 : 18;
           ctx.beginPath(); ctx.arc(this.ball.x, this.ball.y, safeR(this.ballR), 0, Math.PI * 2); ctx.fill(); ctx.restore();
 
-          this.drawStyledShield(ctx, this.p1, theme.p1, shape, visualStyle);
-          this.drawStyledShield(ctx, this.p2, theme.p2, shape, visualStyle);
+          this.drawPaddle(ctx, this.p1, theme.p1, shape, visualStyle);
+          this.drawPaddle(ctx, this.p2, theme.p2, shape, visualStyle);
           renderVisualPostOverlay(ctx, w, h, visualStyle);
         }
 
-        drawStyledShield(ctx, paddle, color, shape, visualStyle) {
-          const hw = this.paddleW * 0.5, hh = this.paddleH * 0.5;
-          ctx.save(); ctx.translate(paddle.x, paddle.y);
-          ctx.fillStyle = visualStyle === 'comic_cel' || visualStyle === 'minimal_flat' ? color : rgba(color, 0.35);
-          ctx.strokeStyle = visualStyle === 'comic_cel' ? '#05070c' : color;
-          ctx.shadowColor = color; ctx.shadowBlur = visualStyle === 'minimal_flat' || visualStyle === 'comic_cel' ? 0 : 16;
-          ctx.lineWidth = 3.5;
-
+        drawPaddle(ctx, pad, color, shape, visualStyle) {
+          ctx.save();
+          ctx.fillStyle = rgba(color, 0.22); ctx.strokeStyle = color;
+          ctx.shadowColor = color; ctx.shadowBlur = visualStyle === 'minimal_flat' ? 0 : 16; ctx.lineWidth = 3;
           ctx.beginPath();
-          if (shape === 'diamond_prism' || shape === 'cyber_jet' || shape === 'star_nova') {
-            ctx.moveTo(-hw, 0); ctx.lineTo(-hw * 0.72, -hh); ctx.lineTo(hw * 0.72, -hh);
-            ctx.lineTo(hw, 0); ctx.lineTo(hw * 0.72, hh); ctx.lineTo(-hw * 0.72, hh); ctx.closePath();
-          } else {
-            ctx.roundRect(-hw, -hh, this.paddleW, this.paddleH, 9);
-          }
-          ctx.fill(); ctx.stroke();
-          ctx.fillStyle = '#ffffff'; ctx.fillRect(-hw * 0.35, -2.5, hw * 0.7, 5);
-          ctx.restore();
+          if (ctx.roundRect) ctx.roundRect(pad.x - this.paddleW * 0.5, pad.y - this.paddleH * 0.5, this.paddleW, this.paddleH, 9);
+          else ctx.rect(pad.x - this.paddleW * 0.5, pad.y - this.paddleH * 0.5, this.paddleW, this.paddleH);
+          ctx.fill(); ctx.stroke(); ctx.restore();
+          renderStyledCraft(ctx, { x: pad.x, y: pad.y, radius: 13, color, shape, visualStyle, angle: 0, time: this.elapsed });
         }
       }
 
       class PaintWarGame {
-        constructor(settings, vfx) {
-          this.settings = settings; this.vfx = vfx;
-          this.gridW = 108; this.gridH = 192;
-          this.grid = new Uint8Array(this.gridW * this.gridH);
-          this.isDirty = true;
-          this.offCanvas = document.createElement('canvas');
-          this.offCanvas.width = this.gridW; this.offCanvas.height = this.gridH;
-          this.offCtx = this.offCanvas.getContext('2d');
-          this.imgData = this.offCtx.createImageData(this.gridW, this.gridH);
-          this.p1Percent = 50; this.p2Percent = 50; this.timeLeft = this.settings.duration || 30; this.elapsed = 0;
-        }
+        constructor(settings, vfx) { this.settings = settings; this.vfx = vfx; this.cols = 24; this.rows = 40; this.grid = []; this.p1Pct = 50; this.p2Pct = 50; this.elapsed = 0; }
         get duration() { return this.settings.duration || 30; }
-        get brushRadiusPx() { return this.settings.brushSize === 'large' ? 36 : 26; }
+        get brushRadiusCells() { return this.settings.brushSize === 'large' ? 2.5 : 1.7; }
 
         init(w, h, input) {
-          this.timeLeft = this.duration; this.elapsed = 0;
-          this.p1 = { x: w * 0.5, y: h * 0.76, prevX: w * 0.5, prevY: h * 0.76 };
-          this.p2 = { x: w * 0.5, y: h * 0.24, prevX: w * 0.5, prevY: h * 0.24 };
-          input.p1.x = this.p1.x; input.p1.y = this.p1.y; input.p2.x = this.p2.x; input.p2.y = this.p2.y;
-          for (let y = 0; y < this.gridH; y++) {
-            const owner = y >= this.gridH * 0.5 ? 1 : 2;
-            for (let x = 0; x < this.gridW; x++) this.grid[y * this.gridW + x] = owner;
+          const theme = getActiveTheme('paint');
+          this.timeLeft = this.duration;
+          this.grid = new Uint8Array(this.cols * this.rows);
+          for (let r = 0; r < this.rows; r++) {
+            const owner = r >= this.rows / 2 ? 1 : 2;
+            for (let c = 0; c < this.cols; c++) this.grid[r * this.cols + c] = owner;
           }
-          this.isDirty = true; this.bombs = []; this.bombTimer = 3.0;
-          this.refreshTexture(); this.recalculatePercentages();
+          this.p1 = { x: w * 0.5, y: h * 0.78, color: theme.p1 };
+          this.p2 = { x: w * 0.5, y: h * 0.22, color: theme.p2 };
+          input.p1.x = this.p1.x; input.p1.y = this.p1.y; input.p2.x = this.p2.x; input.p2.y = this.p2.y;
+          this.bombs = []; this.bombTimer = 3.2; this.recalcCoverage();
         }
 
-        paintCircle(nx, ny, radiusNormX, radiusNormY, owner) {
-          const cx = Math.floor(nx * this.gridW), cy = Math.floor(ny * this.gridH);
-          const rx = Math.max(1, Math.ceil(radiusNormX * this.gridW)), ry = Math.max(1, Math.ceil(radiusNormY * this.gridH));
-          const minX = Math.max(0, cx - rx), maxX = Math.min(this.gridW - 1, cx + rx);
-          const minY = Math.max(0, cy - ry), maxY = Math.min(this.gridH - 1, cy + ry);
-          for (let y = minY; y <= maxY; y++) {
-            const dy = (y - cy) / ry, dy2 = dy * dy, rowOffset = y * this.gridW;
-            for (let x = minX; x <= maxX; x++) {
-              const dx = (x - cx) / rx;
-              if (dx * dx + dy2 <= 1.0 && this.grid[rowOffset + x] !== owner) {
-                this.grid[rowOffset + x] = owner; this.isDirty = true;
-              }
+        paintDisc(x, y, w, h, owner, radiusCells) {
+          const cellW = w / this.cols, cellH = h / this.rows;
+          const cc = x / cellW, cr = y / cellH;
+          const minC = Math.max(0, Math.floor(cc - radiusCells - 1)), maxC = Math.min(this.cols - 1, Math.ceil(cc + radiusCells + 1));
+          const minR = Math.max(0, Math.floor(cr - radiusCells - 1)), maxR = Math.min(this.rows - 1, Math.ceil(cr + radiusCells + 1));
+          const rSq = radiusCells * radiusCells;
+          for (let r = minR; r <= maxR; r++) {
+            for (let c = minC; c <= maxC; c++) {
+              const dc = (c + 0.5) - cc, dr = (r + 0.5) - cr;
+              if (dc * dc + dr * dr <= rSq) this.grid[r * this.cols + c] = owner;
             }
           }
         }
 
-        paintStroke(x1, y1, x2, y2, w, h, radiusPx, owner) {
+        paintLine(x1, y1, x2, y2, w, h, owner, radiusCells) {
           const dist = Math.hypot(x2 - x1, y2 - y1);
-          const steps = Math.max(1, Math.ceil(dist / (radiusPx * 0.35)));
-          const rxNorm = radiusPx / Math.max(1, w), ryNorm = radiusPx / Math.max(1, h);
+          const steps = Math.max(1, Math.ceil(dist / 8));
           for (let i = 0; i <= steps; i++) {
             const tVal = i / steps;
-            this.paintCircle((x1 + (x2 - x1) * tVal) / w, (y1 + (y2 - y1) * tVal) / h, rxNorm, ryNorm, owner);
+            this.paintDisc(x1 + (x2 - x1) * tVal, y1 + (y2 - y1) * tVal, w, h, owner, radiusCells);
           }
         }
 
-        refreshTexture() {
-          if (!this.isDirty) return;
-          this.isDirty = false;
-          const theme = getActiveTheme('paint');
-          const c1 = hexToRgb(theme.p1), c2 = hexToRgb(theme.p2);
-          const data = this.imgData.data;
-          for (let i = 0; i < this.grid.length; i++) {
-            const idx = i * 4;
-            if (this.grid[i] === 1) { data[idx] = Math.round(c1.r * 0.34); data[idx + 1] = Math.round(c1.g * 0.34); data[idx + 2] = Math.round(c1.b * 0.34); data[idx + 3] = 255; }
-            else { data[idx] = Math.round(c2.r * 0.34); data[idx + 1] = Math.round(c2.g * 0.34); data[idx + 2] = Math.round(c2.b * 0.34); data[idx + 3] = 255; }
-          }
-          this.offCtx.putImageData(this.imgData, 0, 0);
-        }
-
-        recalculatePercentages() {
-          let p1Count = 0; const total = this.grid.length;
-          for (let i = 0; i < total; i++) if (this.grid[i] === 1) p1Count++;
-          this.p1Percent = Math.round((p1Count / total) * 100);
-          this.p2Percent = 100 - this.p1Percent;
+        recalcCoverage() {
+          let c1 = 0, c2 = 0; const total = this.grid.length || 1;
+          for (let i = 0; i < total; i++) { if (this.grid[i] === 1) c1++; else if (this.grid[i] === 2) c2++; }
+          this.p1Pct = Math.round((c1 / total) * 100); this.p2Pct = 100 - this.p1Pct;
         }
 
         update(dt, w, h, input, onTimeUp) {
           this.elapsed += dt;
           const theme = getActiveTheme('paint');
           this.timeLeft = Math.max(0, this.timeLeft - dt);
-          const r = this.brushRadiusPx;
-          const nx1 = clamp(input.p1.x, r, w - r), ny1 = clamp(input.p1.y, r, h - r);
-          const nx2 = clamp(input.p2.x, r, w - r), ny2 = clamp(input.p2.y, r, h - r);
+          const n1x = clamp(input.p1.x, 18, w - 18), n1y = clamp(input.p1.y, 18, h - 18);
+          const n2x = clamp(input.p2.x, 18, w - 18), n2y = clamp(input.p2.y, 18, h - 18);
 
-          this.paintStroke(this.p1.prevX, this.p1.prevY, nx1, ny1, w, h, r, 1);
-          this.paintStroke(this.p2.prevX, this.p2.prevY, nx2, ny2, w, h, r, 2);
-          this.p1.x = this.p1.prevX = nx1; this.p1.y = this.p1.prevY = ny1;
-          this.p2.x = this.p2.prevX = nx2; this.p2.y = this.p2.prevY = ny2;
+          this.paintLine(this.p1.x, this.p1.y, n1x, n1y, w, h, 1, this.brushRadiusCells);
+          this.paintLine(this.p2.x, this.p2.y, n2x, n2y, w, h, 2, this.brushRadiusCells);
+          this.p1.x = n1x; this.p1.y = n1y; this.p2.x = n2x; this.p2.y = n2y;
 
           this.bombTimer -= dt;
-          if (this.bombTimer <= 0 && this.bombs.length < 3) {
-            this.bombs.push({ x: w * (0.18 + Math.random() * 0.64), y: h * (0.20 + Math.random() * 0.60), radius: 22, pulse: 0 });
-            this.bombTimer = 3.4;
+          if (this.bombTimer <= 0 && this.bombs.length < 2) {
+            this.bombs.push({ x: w * (0.18 + Math.random() * 0.64), y: h * (0.2 + Math.random() * 0.6), radius: 22, pulse: 0 });
+            this.bombTimer = 4.2;
           }
           for (let i = this.bombs.length - 1; i >= 0; i--) {
-            const b = this.bombs[i]; b.pulse += dt * 7;
-            if (Math.hypot(this.p1.x - b.x, this.p1.y - b.y) < r + b.radius) { this.detonateBomb(b, w, h, 1, theme.p1); this.bombs.splice(i, 1); }
-            else if (Math.hypot(this.p2.x - b.x, this.p2.y - b.y) < r + b.radius) { this.detonateBomb(b, w, h, 2, theme.p2); this.bombs.splice(i, 1); }
+            const b = this.bombs[i]; b.pulse += dt * 6;
+            if (Math.hypot(this.p1.x - b.x, this.p1.y - b.y) < b.radius + 20) {
+              this.paintDisc(b.x, b.y, w, h, 1, 5.2); sound.playPowerup();
+              this.vfx.spawnRing(b.x, b.y, theme.p1, 130, 0.36); this.vfx.spawnSparks(b.x, b.y, theme.p1, 24, 320); this.vfx.shake(7, 0.18);
+              this.bombs.splice(i, 1);
+            } else if (Math.hypot(this.p2.x - b.x, this.p2.y - b.y) < b.radius + 20) {
+              this.paintDisc(b.x, b.y, w, h, 2, 5.2); sound.playPowerup();
+              this.vfx.spawnRing(b.x, b.y, theme.p2, 130, 0.36); this.vfx.spawnSparks(b.x, b.y, theme.p2, 24, 320); this.vfx.shake(7, 0.18);
+              this.bombs.splice(i, 1);
+            }
           }
-          this.refreshTexture();
-          this.recalculatePercentages();
-          if (this.timeLeft <= 0) onTimeUp();
-        }
-
-        detonateBomb(bomb, w, h, owner, color) {
-          sound.playExplosion();
-          const splashR = Math.min(w, h) * 0.27;
-          this.paintCircle(bomb.x / w, bomb.y / h, splashR / w, splashR / h, owner);
-          this.vfx.shake(11, 0.25); this.vfx.spawnRing(bomb.x, bomb.y, color, splashR, 0.38); this.vfx.spawnSparks(bomb.x, bomb.y, color, 28, 340);
+          this.recalcCoverage();
+          if (this.timeLeft <= 0) { sound.playScore(this.p1Pct >= this.p2Pct); onTimeUp(); }
         }
 
         render(ctx, w, h) {
           const theme = getActiveTheme('paint');
           const visualStyle = this.settings.visualStyle || 'neon_bloom';
           const shape = this.settings.vehicleShape || 'drone_cross';
-          ctx.save(); ctx.imageSmoothingEnabled = true; ctx.drawImage(this.offCanvas, 0, 0, w, h); ctx.restore();
-
-          for (const b of this.bombs) {
-            const rad = safeR(b.radius + Math.sin(b.pulse) * 3);
-            ctx.save();
-            ctx.fillStyle = rgba(theme.accent, 0.24); ctx.strokeStyle = theme.accent; ctx.lineWidth = 3;
-            ctx.beginPath(); ctx.arc(b.x, b.y, rad, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-            ctx.fillStyle = '#ffffff'; ctx.font = '900 10px Orbitron, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText('BOOM', b.x, b.y);
+          const cellW = w / this.cols, cellH = h / this.rows;
+          for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols; c++) {
+              const owner = this.grid[r * this.cols + c];
+              ctx.fillStyle = owner === 1 ? rgba(theme.p1, 0.44) : owner === 2 ? rgba(theme.p2, 0.44) : theme.bg;
+              ctx.fillRect(c * cellW, r * cellH, Math.ceil(cellW), Math.ceil(cellH));
+            }
+          }
+          if (visualStyle === 'blueprint_cad' || visualStyle === 'retro_crt') {
+            ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1;
+            for (let c = 0; c <= this.cols; c += 2) { ctx.beginPath(); ctx.moveTo(c * cellW, 0); ctx.lineTo(c * cellW, h); ctx.stroke(); }
+            for (let r = 0; r <= this.rows; r += 2) { ctx.beginPath(); ctx.moveTo(0, r * cellH); ctx.lineTo(w, r * cellH); ctx.stroke(); }
             ctx.restore();
           }
 
-          const r = this.brushRadiusPx;
-          renderStyledCraft(ctx, { x: this.p1.x, y: this.p1.y, radius: r, color: theme.p1, shape, visualStyle, angle: -Math.PI / 2, time: this.elapsed });
-          renderStyledCraft(ctx, { x: this.p2.x, y: this.p2.y, radius: r, color: theme.p2, shape, visualStyle, angle: Math.PI / 2, time: this.elapsed });
+          for (const b of this.bombs) {
+            const r = safeR(b.radius + Math.sin(b.pulse) * 3);
+            ctx.save(); ctx.fillStyle = rgba(theme.accent, 0.24); ctx.strokeStyle = theme.accent; ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.arc(b.x, b.y, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#ffffff'; ctx.font = '900 10px Orbitron, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('BOMB', b.x, b.y); ctx.restore();
+          }
+          renderStyledCraft(ctx, { x: this.p1.x, y: this.p1.y, radius: 19, color: theme.p1, shape, visualStyle, angle: 0, time: this.elapsed });
+          renderStyledCraft(ctx, { x: this.p2.x, y: this.p2.y, radius: 19, color: theme.p2, shape, visualStyle, angle: 0, time: this.elapsed });
           renderVisualPostOverlay(ctx, w, h, visualStyle);
         }
       }
 
       /* =========================================================================
-       * 15. MAIN APPLICATION CONTROLLER, GAME-SPECIFIC PREVIEW & UI BINDING
+       * 15. HERO MULTI-STAGE LOOPING GAME PREVIEW CANVAS
        * ========================================================================= */
-      const menuView = document.getElementById('menuView');
-      const gameView = document.getElementById('gameView');
-      const gameCanvas = document.getElementById('gameCanvas');
-      const ctx = gameCanvas.getContext('2d');
+      const heroCanvas = document.getElementById('heroFxCanvas');
+      const heroCtx = heroCanvas.getContext('2d');
+      let heroAnimId = null;
 
-      const heroFxCanvas = document.getElementById('heroFxCanvas');
-      const heroFxCtx = heroFxCanvas.getContext('2d');
+      function startHeroPreviewAnimation() {
+        if (heroAnimId) cancelAnimationFrame(heroAnimId);
+        function loop(now) {
+          const rect = heroCanvas.getBoundingClientRect();
+          const w = rect.width || 300;
+          const h = rect.height || 54;
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          if (heroCanvas.width !== Math.round(w * dpr) || heroCanvas.height !== Math.round(h * dpr)) {
+            heroCanvas.width = Math.round(w * dpr);
+            heroCanvas.height = Math.round(h * dpr);
+          }
 
-      const selectedGameSummaryCard = document.getElementById('selectedGameSummaryCard');
-      const openGameSelectBtn = document.getElementById('openGameSelectBtn');
-      const gameSelectModal = document.getElementById('gameSelectModal');
-      const closeGameSelectBtn = document.getElementById('closeGameSelectBtn');
-      const gameCardsContainer = document.getElementById('gameCardsContainer');
+          heroCtx.save();
+          heroCtx.scale(dpr, dpr);
 
-      const startBtn = document.getElementById('startBtn');
-      const startBtnMainText = document.getElementById('startBtnMainText');
-      const startBtnSubtitle = document.getElementById('startBtnSubtitle');
+          const totalSec = now * 0.001;
+          const stage = Math.floor(totalSec / 3.0) % 4;
+          const st = totalSec % 3.0;
 
-      const settingsModal = document.getElementById('settingsModal');
-      const openSettingsBtn = document.getElementById('openSettingsBtn');
-      const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-      const doneSettingsBtn = document.getElementById('doneSettingsBtn');
-      const contextSettingsTitle = document.getElementById('contextSettingsTitle');
-      const contextSettingsBadge = document.getElementById('contextSettingsBadge');
-      const contextSettingsContainer = document.getElementById('contextSettingsContainer');
+          heroCtx.fillStyle = '#07090f';
+          heroCtx.fillRect(0, 0, w, h);
 
-      const soundOnBtn = document.getElementById('soundOnBtn');
-      const soundOffBtn = document.getElementById('soundOffBtn');
-      const volumeSlider = document.getElementById('volumeSlider');
-      const volumeValue = document.getElementById('volumeValue');
-      const volumeRow = document.getElementById('volumeRow');
+          heroCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+          heroCtx.lineWidth = 1;
+          for (let gx = 0; gx < w; gx += 18) { heroCtx.beginPath(); heroCtx.moveTo(gx, 0); heroCtx.lineTo(gx, h); heroCtx.stroke(); }
+          heroCtx.beginPath(); heroCtx.moveTo(w * 0.5, 0); heroCtx.lineTo(w * 0.5, h); heroCtx.stroke();
 
-      const pauseSoundOnBtn = document.getElementById('pauseSoundOnBtn');
-      const pauseSoundOffBtn = document.getElementById('pauseSoundOffBtn');
-      const pauseVolumeSlider = document.getElementById('pauseVolumeSlider');
-      const pauseVolumeValue = document.getElementById('pauseVolumeValue');
-      const pauseVolumeRow = document.getElementById('pauseVolumeRow');
+          if (stage === 0) {
+            const p1x = 34 + Math.sin(st * 4.5) * 14;
+            const p1y = h * 0.5 + Math.cos(st * 3.5) * 11;
+            const p2x = w - 34 + Math.cos(st * 4.2) * 14;
+            const p2y = h * 0.5 + Math.sin(st * 3.8) * 11;
+            const puckX = w * 0.5 + Math.sin(st * 6.2) * (w * 0.28);
+            const puckY = h * 0.5 + Math.cos(st * 4.8) * 14;
 
+            renderStyledCraft(heroCtx, { x: p1x, y: p1y, radius: 11, color: '#00f0ff', shape: 'classic_disc', visualStyle: 'neon_bloom', time: totalSec });
+            renderStyledCraft(heroCtx, { x: p2x, y: p2y, radius: 11, color: '#ff2a85', shape: 'classic_disc', visualStyle: 'neon_bloom', time: totalSec });
+
+            heroCtx.fillStyle = '#ffffff';
+            heroCtx.shadowColor = '#00f0ff';
+            heroCtx.shadowBlur = 10;
+            heroCtx.beginPath();
+            heroCtx.arc(puckX, puckY, 6, 0, Math.PI * 2);
+            heroCtx.fill();
+            heroCtx.shadowBlur = 0;
+          } else if (stage === 1) {
+            const clash = Math.sin((st / 3.0) * Math.PI);
+            const p1x = w * 0.5 - 42 + clash * 28;
+            const p2x = w * 0.5 + 42 - clash * 28;
+
+            heroCtx.strokeStyle = 'rgba(255, 190, 11, 0.35)';
+            heroCtx.lineWidth = 2;
+            heroCtx.beginPath(); heroCtx.arc(w * 0.5, h * 0.5, 22, 0, Math.PI * 2); heroCtx.stroke();
+
+            if (clash > 0.85) {
+              heroCtx.strokeStyle = '#ffbe0b';
+              heroCtx.lineWidth = 2;
+              heroCtx.beginPath(); heroCtx.arc(w * 0.5, h * 0.5, (clash - 0.85) * 180, 0, Math.PI * 2); heroCtx.stroke();
+            }
+
+            renderStyledCraft(heroCtx, { x: p1x, y: h * 0.5, radius: 12, color: '#00f0ff', shape: 'octagon_tank', visualStyle: 'neon_bloom', time: totalSec });
+            renderStyledCraft(heroCtx, { x: p2x, y: h * 0.5, radius: 12, color: '#ff2a85', shape: 'octagon_tank', visualStyle: 'neon_bloom', time: totalSec });
+          } else if (stage === 2) {
+            const prog = st / 3.0;
+            const x1 = 24 + prog * (w - 48);
+            const y1 = h * 0.5 + Math.sin(prog * 8) * 12;
+            const x2 = w - 24 - prog * (w - 48);
+            const y2 = h * 0.5 - Math.sin(prog * 8) * 12;
+
+            heroCtx.strokeStyle = '#00f0ff'; heroCtx.lineWidth = 3;
+            heroCtx.beginPath();
+            for (let i = 0; i <= 20; i++) {
+              const p = Math.max(0, prog - (20 - i) * 0.02);
+              const px = 24 + p * (w - 48);
+              const py = h * 0.5 + Math.sin(p * 8) * 12;
+              if (i === 0) heroCtx.moveTo(px, py); else heroCtx.lineTo(px, py);
+            }
+            heroCtx.stroke();
+
+            heroCtx.strokeStyle = '#ff2a85';
+            heroCtx.beginPath();
+            for (let i = 0; i <= 20; i++) {
+              const p = Math.max(0, prog - (20 - i) * 0.02);
+              const px = w - 24 - p * (w - 48);
+              const py = h * 0.5 - Math.sin(p * 8) * 12;
+              if (i === 0) heroCtx.moveTo(px, py); else heroCtx.lineTo(px, py);
+            }
+            heroCtx.stroke();
+
+            renderStyledCraft(heroCtx, { x: x1, y: y1, radius: 9, color: '#00f0ff', shape: 'cyber_jet', visualStyle: 'neon_bloom', angle: 0, time: totalSec });
+            renderStyledCraft(heroCtx, { x: x2, y: y2, radius: 9, color: '#ff2a85', shape: 'cyber_jet', visualStyle: 'neon_bloom', angle: Math.PI, time: totalSec });
+          } else {
+            const prog = st / 3.0;
+            heroCtx.fillStyle = 'rgba(0, 240, 255, 0.25)';
+            heroCtx.fillRect(0, 0, w * (0.3 + prog * 0.25), h);
+            heroCtx.fillStyle = 'rgba(255, 42, 133, 0.25)';
+            heroCtx.fillRect(w * (0.45 + prog * 0.25), 0, w, h);
+
+            const bx = w * 0.5 + Math.sin(st * 5) * (w * 0.35);
+            const by = h * 0.5 + Math.cos(st * 4) * 13;
+            heroCtx.fillStyle = '#b829ff';
+            heroCtx.beginPath(); heroCtx.arc(bx, by, 6, 0, Math.PI * 2); heroCtx.fill();
+
+            renderStyledCraft(heroCtx, { x: 28, y: h * 0.5 + Math.cos(st * 4) * 12, radius: 10, color: '#00f0ff', shape: 'diamond_prism', visualStyle: 'neon_bloom', time: totalSec });
+            renderStyledCraft(heroCtx, { x: w - 28, y: h * 0.5 - Math.cos(st * 4) * 12, radius: 10, color: '#ff2a85', shape: 'diamond_prism', visualStyle: 'neon_bloom', time: totalSec });
+          }
+
+          heroCtx.restore();
+          heroAnimId = requestAnimationFrame(loop);
+        }
+        heroAnimId = requestAnimationFrame(loop);
+      }
+
+      /* =========================================================================
+       * 16. GAME-ADAPTIVE LIVE PREVIEW MODAL
+       * ========================================================================= */
       const universalPreviewModal = document.getElementById('universalPreviewModal');
       const previewCategoryTag = document.getElementById('previewCategoryTag');
       const previewItemTitle = document.getElementById('previewItemTitle');
       const previewBadge = document.getElementById('previewBadge');
       const previewHintText = document.getElementById('previewHintText');
-      const universalPreviewCanvas = document.getElementById('universalPreviewCanvas');
-      const universalPreviewCtx = universalPreviewCanvas.getContext('2d');
       const previewCancelBtn = document.getElementById('previewCancelBtn');
       const previewConfirmBtn = document.getElementById('previewConfirmBtn');
+      const previewCanvas = document.getElementById('universalPreviewCanvas');
+      const previewCtx = previewCanvas.getContext('2d');
 
-      const inGameMenuBtn = document.getElementById('inGameMenuBtn');
+      let pendingPreviewState = null;
+      let previewAnimId = null;
+
+      function openUniversalPreview(gameId, category, candidateValue, titleText) {
+        pendingPreviewState = { gameId, category, candidateValue };
+        previewItemTitle.textContent = titleText;
+        previewBadge.textContent = t('livePreview');
+        previewHintText.textContent = t('previewHint');
+        previewCancelBtn.textContent = t('cancel');
+        previewConfirmBtn.textContent = t('confirmSelect');
+
+        if (category === 'theme') previewCategoryTag.textContent = t('previewArenaTag');
+        else if (category === 'vehicleShape') previewCategoryTag.textContent = t('previewShapeTag');
+        else previewCategoryTag.textContent = t('previewGfxTag');
+
+        universalPreviewModal.classList.remove('hidden');
+        universalPreviewModal.classList.add('flex');
+
+        if (previewAnimId) cancelAnimationFrame(previewAnimId);
+        function loop(now) {
+          if (!pendingPreviewState) return;
+          renderGameSpecificPreviewFrame(now * 0.001);
+          previewAnimId = requestAnimationFrame(loop);
+        }
+        previewAnimId = requestAnimationFrame(loop);
+      }
+
+      function closeUniversalPreview() {
+        pendingPreviewState = null;
+        if (previewAnimId) { cancelAnimationFrame(previewAnimId); previewAnimId = null; }
+        universalPreviewModal.classList.add('hidden');
+        universalPreviewModal.classList.remove('flex');
+      }
+
+      function renderGameSpecificPreviewFrame(time) {
+        if (!pendingPreviewState) return;
+        const { gameId, category, candidateValue } = pendingPreviewState;
+        const game = GAMES_CATALOG.find(g => g.id === gameId) || GAMES_CATALOG[0];
+        const s = userGameSettings[gameId];
+
+        const activeThemeId = category === 'theme' ? candidateValue : s.theme;
+        const activeShape = category === 'vehicleShape' ? candidateValue : s.vehicleShape;
+        const activeStyle = category === 'visualStyle' ? candidateValue : s.visualStyle;
+        const theme = game.themes.find(th => th.id === activeThemeId) || game.themes[0];
+
+        const rect = previewCanvas.getBoundingClientRect();
+        const w = rect.width || 300;
+        const h = rect.height || 208;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        if (previewCanvas.width !== Math.round(w * dpr) || previewCanvas.height !== Math.round(h * dpr)) {
+          previewCanvas.width = Math.round(w * dpr);
+          previewCanvas.height = Math.round(h * dpr);
+        }
+
+        previewCtx.save();
+        previewCtx.scale(dpr, dpr);
+
+        renderArenaBackdrop(previewCtx, w, h, theme, activeStyle, time);
+
+        if (gameId === 'airhockey') {
+          previewCtx.strokeStyle = rgba(theme.line, 0.35);
+          previewCtx.lineWidth = 2;
+          previewCtx.strokeRect(8, 8, w - 16, h - 16);
+          previewCtx.beginPath(); previewCtx.moveTo(8, h * 0.5); previewCtx.lineTo(w - 8, h * 0.5); previewCtx.stroke();
+          previewCtx.beginPath(); previewCtx.arc(w * 0.5, h * 0.5, 24, 0, Math.PI * 2); previewCtx.stroke();
+
+          previewCtx.strokeStyle = theme.p2; previewCtx.lineWidth = 5;
+          previewCtx.beginPath(); previewCtx.moveTo(w * 0.34, 8); previewCtx.lineTo(w * 0.66, 8); previewCtx.stroke();
+          previewCtx.strokeStyle = theme.p1;
+          previewCtx.beginPath(); previewCtx.moveTo(w * 0.34, h - 8); previewCtx.lineTo(w * 0.66, h - 8); previewCtx.stroke();
+
+          const px = w * 0.5 + Math.sin(time * 2.8) * 52;
+          const py = h * 0.5 + Math.cos(time * 2.1) * 34;
+          previewCtx.fillStyle = theme.accent;
+          previewCtx.beginPath(); previewCtx.arc(px, py, 11, 0, Math.PI * 2); previewCtx.fill();
+
+          renderStyledCraft(previewCtx, { x: w * 0.5 + Math.sin(time * 2.2) * 38, y: h * 0.76, radius: 20, color: theme.p1, shape: activeShape, visualStyle: activeStyle, time });
+          renderStyledCraft(previewCtx, { x: w * 0.5 - Math.sin(time * 2.2) * 38, y: h * 0.24, radius: 20, color: theme.p2, shape: activeShape, visualStyle: activeStyle, time });
+        } else if (gameId === 'sumo') {
+          const ringR = Math.min(w, h) * 0.41;
+          previewCtx.strokeStyle = theme.line;
+          previewCtx.lineWidth = 3.5;
+          previewCtx.beginPath(); previewCtx.arc(w * 0.5, h * 0.5, safeR(ringR), 0, Math.PI * 2); previewCtx.stroke();
+
+          const clash = Math.sin(time * 2.6) * 14;
+          renderStyledCraft(previewCtx, { x: w * 0.5 - 22 + clash, y: h * 0.62, radius: 21, color: theme.p1, shape: activeShape, visualStyle: activeStyle, angle: -Math.PI / 3, time });
+          renderStyledCraft(previewCtx, { x: w * 0.5 + 22 - clash, y: h * 0.38, radius: 21, color: theme.p2, shape: activeShape, visualStyle: activeStyle, angle: (2 * Math.PI) / 3, time });
+        } else if (gameId === 'tron') {
+          previewCtx.strokeStyle = rgba(theme.line, 0.3);
+          previewCtx.lineWidth = 2;
+          previewCtx.strokeRect(8, 8, w - 16, h - 16);
+
+          const x1 = w * 0.36 + Math.sin(time * 2.2) * 26;
+          const y1 = h * 0.66 + Math.cos(time * 2.2) * 16;
+          const x2 = w * 0.64 - Math.sin(time * 2.2) * 26;
+          const y2 = h * 0.34 - Math.cos(time * 2.2) * 16;
+
+          previewCtx.strokeStyle = theme.p1; previewCtx.lineWidth = 5;
+          previewCtx.beginPath(); previewCtx.moveTo(w * 0.22, h * 0.85); previewCtx.lineTo(x1, y1); previewCtx.stroke();
+          previewCtx.strokeStyle = theme.p2;
+          previewCtx.beginPath(); previewCtx.moveTo(w * 0.78, h * 0.15); previewCtx.lineTo(x2, y2); previewCtx.stroke();
+
+          renderStyledCraft(previewCtx, { x: x1, y: y1, radius: 15, color: theme.p1, shape: activeShape, visualStyle: activeStyle, angle: -0.6, time });
+          renderStyledCraft(previewCtx, { x: x2, y: y2, radius: 15, color: theme.p2, shape: activeShape, visualStyle: activeStyle, angle: 2.5, time });
+        } else if (gameId === 'pong') {
+          previewCtx.strokeStyle = rgba(theme.line, 0.3);
+          previewCtx.lineWidth = 2;
+          previewCtx.strokeRect(8, 8, w - 16, h - 16);
+          previewCtx.setLineDash([6, 6]);
+          previewCtx.beginPath(); previewCtx.moveTo(8, h * 0.5); previewCtx.lineTo(w - 8, h * 0.5); previewCtx.stroke();
+          previewCtx.setLineDash([]);
+
+          const p1x = w * 0.5 + Math.sin(time * 2.5) * 55;
+          const p2x = w * 0.5 - Math.sin(time * 2.5) * 55;
+          previewCtx.fillStyle = rgba(theme.p1, 0.3); previewCtx.strokeStyle = theme.p1; previewCtx.lineWidth = 2.5;
+          previewCtx.fillRect(p1x - 36, h * 0.8 - 6, 72, 12); previewCtx.strokeRect(p1x - 36, h * 0.8 - 6, 72, 12);
+          previewCtx.fillStyle = rgba(theme.p2, 0.3); previewCtx.strokeStyle = theme.p2;
+          previewCtx.fillRect(p2x - 36, h * 0.2 - 6, 72, 12); previewCtx.strokeRect(p2x - 36, h * 0.2 - 6, 72, 12);
+
+          renderStyledCraft(previewCtx, { x: p1x, y: h * 0.8, radius: 12, color: theme.p1, shape: activeShape, visualStyle: activeStyle, time });
+          renderStyledCraft(previewCtx, { x: p2x, y: h * 0.2, radius: 12, color: theme.p2, shape: activeShape, visualStyle: activeStyle, time });
+
+          previewCtx.fillStyle = theme.accent;
+          previewCtx.beginPath();
+          previewCtx.arc(w * 0.5 + Math.cos(time * 3.5) * 44, h * 0.5 + Math.sin(time * 3.5) * 32, 9, 0, Math.PI * 2);
+          previewCtx.fill();
+        } else {
+          previewCtx.fillStyle = rgba(theme.p1, 0.42);
+          previewCtx.fillRect(0, h * 0.5, w, h * 0.5);
+          previewCtx.fillStyle = rgba(theme.p2, 0.42);
+          previewCtx.fillRect(0, 0, w, h * 0.5);
+
+          const x1 = w * 0.45 + Math.sin(time * 2.6) * 46;
+          const y1 = h * 0.65 + Math.cos(time * 2.2) * 18;
+          const x2 = w * 0.55 - Math.sin(time * 2.6) * 46;
+          const y2 = h * 0.35 - Math.cos(time * 2.2) * 18;
+
+          previewCtx.fillStyle = rgba(theme.p1, 0.55);
+          previewCtx.beginPath(); previewCtx.arc(x1, y1, 24, 0, Math.PI * 2); previewCtx.fill();
+          previewCtx.fillStyle = rgba(theme.p2, 0.55);
+          previewCtx.beginPath(); previewCtx.arc(x2, y2, 24, 0, Math.PI * 2); previewCtx.fill();
+
+          renderStyledCraft(previewCtx, { x: x1, y: y1, radius: 17, color: theme.p1, shape: activeShape, visualStyle: activeStyle, time });
+          renderStyledCraft(previewCtx, { x: x2, y: y2, radius: 17, color: theme.p2, shape: activeShape, visualStyle: activeStyle, time });
+        }
+
+        renderVisualPostOverlay(previewCtx, w, h, activeStyle);
+        previewCtx.restore();
+      }
+
+      previewCancelBtn.addEventListener('click', () => {
+        sound.playSelect();
+        closeUniversalPreview();
+      });
+
+      previewConfirmBtn.addEventListener('click', () => {
+        if (!pendingPreviewState) return;
+        sound.playPowerup();
+        const { gameId, category, candidateValue } = pendingPreviewState;
+        userGameSettings[gameId][category] = candidateValue;
+        closeUniversalPreview();
+        renderAllUI();
+      });
+
+      /* =========================================================================
+       * 17. MASTER GAME ORCHESTRATOR
+       * ========================================================================= */
+      const menuView = document.getElementById('menuView');
+      const gameView = document.getElementById('gameView');
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+
+      const gameSelectModal = document.getElementById('gameSelectModal');
+      const gameCardsContainer = document.getElementById('gameCardsContainer');
+
+      const settingsModal = document.getElementById('settingsModal');
       const pauseModal = document.getElementById('pauseModal');
-      const pauseGameTitle = document.getElementById('pauseGameTitle');
-      const pauseGameSettingsContainer = document.getElementById('pauseGameSettingsContainer');
-      const resumeTopBtn = document.getElementById('resumeTopBtn');
-      const resumeBtn = document.getElementById('resumeBtn');
-      const pauseRestartBtn = document.getElementById('pauseRestartBtn');
-      const pauseExitBtn = document.getElementById('pauseExitBtn');
-
       const resultModal = document.getElementById('resultModal');
-      const modalTopBanner = document.getElementById('modalTopBanner');
-      const modalTitleP1 = document.getElementById('modalTitleP1');
-      const modalTitleP2 = document.getElementById('modalTitleP2');
-      const modalScoreSummary = document.getElementById('modalScoreSummary');
-      const replayBtn = document.getElementById('replayBtn');
-      const backToMenuBtn = document.getElementById('backToMenuBtn');
 
-      const directTouch = new DirectTouchController(gameCanvas);
-      const joystickCtrl = new VirtualJoystickController(gameCanvas);
+      const directTouch = new DirectTouchController(canvas);
+      const joystickCtrl = new VirtualJoystickController(canvas);
       const vfx = new VisualEffects();
 
       let activeGameEngine = null;
       let gameState = 'menu';
+      let isPaused = false;
       let countdownTimer = 0;
       let roundPauseTimer = 0;
+      let pendingAction = null;
       let lastFrameTime = 0;
-      let rafId = null;
-      let viewW = window.innerWidth;
-      let viewH = window.innerHeight;
+      let animFrameId = null;
+      let canvasW = 360;
+      let canvasH = 640;
 
-      let previewState = null;
-      let previewRafId = null;
-      let previewTime = 0;
+      function resizeCanvas() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvasW = window.innerWidth || document.documentElement.clientWidth || 360;
+        canvasH = window.innerHeight || document.documentElement.clientHeight || 640;
+        canvas.width = Math.max(1, Math.round(canvasW * dpr));
+        canvas.height = Math.max(1, Math.round(canvasH * dpr));
+        canvas.style.width = `${canvasW}px`;
+        canvas.style.height = `${canvasH}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        if (joystickCtrl.enabled) joystickCtrl.layout(canvasW, canvasH);
+      }
 
-      let heroFxRafId = null;
-      let heroFxTime = 0;
+      window.addEventListener('resize', resizeCanvas);
+      window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 120));
 
+      function updateInGameMenuButtonTheme() {
+        const theme = getActiveTheme(selectedGameId);
+        const btn = document.getElementById('inGameMenuBtn');
+        const icon = document.getElementById('inGameMenuIcon');
+        btn.style.backgroundColor = rgba(theme.bg, 0.88);
+        btn.style.borderColor = rgba(theme.line, 0.55);
+        btn.style.boxShadow = `0 6px 20px ${rgba(theme.line, 0.25)}`;
+        icon.style.color = theme.line;
+      }
+
+      function createEngineForGame(id) {
+        const s = userGameSettings[id];
+        switch (id) {
+          case 'airhockey': return new AirHockeyGame(s, vfx);
+          case 'sumo': return new SumoGame(s, vfx);
+          case 'tron': return new TronGame(s, vfx);
+          case 'pong': return new SpinPongGame(s, vfx);
+          case 'paint': return new PaintWarGame(s, vfx);
+          default: return new AirHockeyGame(s, vfx);
+        }
+      }
+
+      function startGame(gameId) {
+        selectedGameId = gameId;
+        sound.unlock();
+        sound.playSelect();
+        resizeCanvas();
+
+        vfx.clear();
+        directTouch.clearTouches();
+        joystickCtrl.clearTouches();
+        isPaused = false;
+        pauseModal.classList.add('hidden');
+        pauseModal.classList.remove('flex');
+        resultModal.classList.add('hidden');
+        resultModal.classList.remove('flex');
+
+        activeGameEngine = createEngineForGame(gameId);
+        const s = userGameSettings[gameId];
+        const theme = getActiveTheme(gameId);
+        const isBot = playMode === 'bot';
+
+        if (gameId === 'airhockey') {
+          directTouch.configure(true, false, isBot, canvasW, canvasH);
+          joystickCtrl.configure(false, 'fixed', false, isBot, canvasW, canvasH, null);
+          activeGameEngine.init(canvasW, canvasH, directTouch);
+        } else if (gameId === 'pong') {
+          directTouch.configure(true, false, isBot, canvasW, canvasH);
+          joystickCtrl.configure(false, 'fixed', false, isBot, canvasW, canvasH, null);
+          activeGameEngine.init(canvasW, canvasH, directTouch);
+        } else if (gameId === 'paint') {
+          directTouch.configure(true, true, isBot, canvasW, canvasH);
+          joystickCtrl.configure(false, 'fixed', false, isBot, canvasW, canvasH, null);
+          activeGameEngine.init(canvasW, canvasH, directTouch);
+        } else if (gameId === 'sumo') {
+          directTouch.configure(false, false, isBot, canvasW, canvasH);
+          joystickCtrl.configure(true, s.joystickType, true, isBot, canvasW, canvasH, (pNum) => {
+            if (gameState === 'playing' && !isPaused && activeGameEngine) activeGameEngine.triggerShock(pNum, joystickCtrl);
+          });
+          joystickCtrl.setColors(theme.p1, theme.p2);
+          activeGameEngine.init(canvasW, canvasH);
+        } else if (gameId === 'tron') {
+          directTouch.configure(false, false, isBot, canvasW, canvasH);
+          joystickCtrl.configure(true, s.joystickType, false, isBot, canvasW, canvasH, null);
+          joystickCtrl.setColors(theme.p1, theme.p2);
+          activeGameEngine.init(canvasW, canvasH);
+        }
+
+        updateInGameMenuButtonTheme();
+        menuView.classList.add('hidden');
+        gameView.classList.remove('hidden');
+        gameView.classList.add('flex');
+        document.body.classList.add('in-game');
+
+        gameState = 'countdown';
+        countdownTimer = 2.4;
+        sound.playCountdown(false);
+
+        if (animFrameId) cancelAnimationFrame(animFrameId);
+        lastFrameTime = performance.now();
+        animFrameId = requestAnimationFrame(gameLoop);
+      }
+
+      function pauseGame() {
+        if (gameState === 'gameover' || gameState === 'menu') return;
+        isPaused = true;
+        directTouch.clearTouches();
+        joystickCtrl.clearTouches();
+        const game = GAMES_CATALOG.find(g => g.id === selectedGameId);
+        document.getElementById('pauseGameTitle').textContent = t(game.titleKey);
+        renderSettingsSchemaInto(document.getElementById('pauseGameSettingsContainer'), selectedGameId, true);
+        pauseModal.classList.remove('hidden');
+        pauseModal.classList.add('flex');
+      }
+
+      function resumeGame() {
+        isPaused = false;
+        pauseModal.classList.add('hidden');
+        pauseModal.classList.remove('flex');
+        lastFrameTime = performance.now();
+      }
+
+      function returnToMenu() {
+        sound.playSelect();
+        isPaused = false;
+        gameState = 'menu';
+        if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
+        directTouch.clearTouches();
+        joystickCtrl.clearTouches();
+        document.body.classList.remove('in-game');
+        pauseModal.classList.add('hidden');
+        pauseModal.classList.remove('flex');
+        resultModal.classList.add('hidden');
+        resultModal.classList.remove('flex');
+        gameView.classList.add('hidden');
+        gameView.classList.remove('flex');
+        menuView.classList.remove('hidden');
+        renderAllUI();
+      }
+
+      function handlePointOrRound(scorer) {
+        if (!activeGameEngine || gameState !== 'playing') return;
+        const target = activeGameEngine.winScore;
+        if (activeGameEngine.p1Score >= target) { showMatchResult(1); return; }
+        if (activeGameEngine.p2Score >= target) { showMatchResult(2); return; }
+
+        gameState = 'roundPause';
+        roundPauseTimer = 0.9;
+        pendingAction = () => {
+          if (!activeGameEngine) return;
+          if (selectedGameId === 'airhockey' || selectedGameId === 'pong') activeGameEngine.resetRound(canvasW, canvasH, scorer);
+          else activeGameEngine.resetRound(canvasW, canvasH);
+          if (joystickCtrl.enabled) joystickCtrl.reset();
+        };
+      }
+
+      function showMatchResult(winner) {
+        gameState = 'gameover';
+        directTouch.clearTouches();
+        joystickCtrl.clearTouches();
+
+        const modalTopBanner = document.getElementById('modalTopBanner');
+        const modalTitleP1 = document.getElementById('modalTitleP1');
+        const modalTitleP2 = document.getElementById('modalTitleP2');
+        const modalScoreSummary = document.getElementById('modalScoreSummary');
+        const theme = getActiveTheme(selectedGameId);
+
+        let winText = t('draw');
+        let winColor = '#ffffff';
+        if (winner === 1) { winText = t('p1Wins'); winColor = theme.p1; }
+        else if (winner === 2) { winText = playMode === 'bot' ? t('botWins') : t('p2Wins'); winColor = theme.p2; }
+
+        if (playMode === 'bot') modalTopBanner.classList.add('hidden');
+        else modalTopBanner.classList.remove('hidden');
+
+        modalTitleP1.textContent = winText; modalTitleP1.style.color = winColor;
+        modalTitleP2.textContent = winText; modalTitleP2.style.color = winColor;
+
+        if (selectedGameId === 'paint') {
+          modalScoreSummary.textContent = `${t('areaLabel')}: ${t('p1Short')} %${activeGameEngine.p1Pct} - ${playMode === 'bot' ? t('botShort') : t('p2Short')} %${activeGameEngine.p2Pct}`;
+        } else {
+          modalScoreSummary.textContent = `${t('scoreLabel')}: ${activeGameEngine.p1Score} - ${activeGameEngine.p2Score}`;
+        }
+
+        resultModal.classList.remove('hidden');
+        resultModal.classList.add('flex');
+      }
+
+      function renderInGameHUD(ctx, w, h) {
+        if (!activeGameEngine) return;
+        const theme = getActiveTheme(selectedGameId);
+        const p2Name = playMode === 'bot' ? t('botShort') : t('p2Short');
+
+        if (selectedGameId === 'paint') {
+          const barW = Math.min(240, w * 0.56), barH = 12, bx = (w - barW) * 0.5;
+          ctx.save();
+          ctx.fillStyle = rgba(theme.p2, 0.85); ctx.fillRect(bx, h * 0.5 - 6, barW, barH);
+          ctx.fillStyle = rgba(theme.p1, 0.92); ctx.fillRect(bx, h * 0.5 - 6, barW * (activeGameEngine.p1Pct / 100), barH);
+          ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 1.5; ctx.strokeRect(bx, h * 0.5 - 6, barW, barH);
+
+          ctx.font = '800 13px Orbitron, sans-serif';
+          ctx.fillStyle = theme.p1; ctx.textAlign = 'left'; ctx.fillText(`%${activeGameEngine.p1Pct}`, bx, h * 0.5 + 22);
+          ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.fillText(`${Math.ceil(activeGameEngine.timeLeft)}${t('secSuffix')}`, w * 0.5, h * 0.5 + 22);
+          ctx.fillStyle = theme.p2; ctx.textAlign = 'right'; ctx.fillText(`%${activeGameEngine.p2Pct}`, bx + barW, h * 0.5 + 22);
+
+          if (playMode !== 'bot') {
+            ctx.save();
+            ctx.translate(w * 0.5, h * 0.5 - 22); ctx.rotate(Math.PI);
+            ctx.fillStyle = theme.p2; ctx.textAlign = 'left'; ctx.fillText(`%${activeGameEngine.p2Pct}`, -barW * 0.5, 0);
+            ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.fillText(`${Math.ceil(activeGameEngine.timeLeft)}${t('secSuffix')}`, 0, 0);
+            ctx.fillStyle = theme.p1; ctx.textAlign = 'right'; ctx.fillText(`%${activeGameEngine.p1Pct}`, barW * 0.5, 0);
+            ctx.restore();
+          }
+          ctx.restore();
+        } else {
+          ctx.save();
+          ctx.font = '900 32px Orbitron, sans-serif';
+          ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+
+          ctx.fillStyle = rgba(theme.p1, 0.45);
+          ctx.fillText(String(activeGameEngine.p1Score), w - 22, h * 0.5 + 32);
+
+          ctx.save();
+          ctx.translate(w - 22, h * 0.5 - 32);
+          if (playMode !== 'bot') ctx.rotate(Math.PI);
+          ctx.textAlign = playMode !== 'bot' ? 'left' : 'right';
+          ctx.fillStyle = rgba(theme.p2, 0.45);
+          ctx.fillText(String(activeGameEngine.p2Score), 0, 0);
+          ctx.restore();
+
+          if (playMode === 'bot') {
+            ctx.font = '800 10px Orbitron, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = rgba(theme.p2, 0.75);
+            ctx.fillText(`${p2Name} (${t('diff_' + botDifficulty)})`, w * 0.5, 22);
+          }
+          ctx.restore();
+        }
+      }
+
+      function renderCountdownOverlay(ctx, w, h) {
+        if (gameState !== 'countdown') return;
+        const theme = getActiveTheme(selectedGameId);
+        const num = Math.ceil(countdownTimer / 0.8);
+        const label = num >= 3 ? '3' : num === 2 ? '2' : num === 1 ? '1' : t('start');
+        ctx.save();
+        ctx.fillStyle = 'rgba(7, 9, 15, 0.42)';
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.font = '900 44px Orbitron, sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = theme.accent; ctx.shadowColor = theme.accent; ctx.shadowBlur = 24;
+        ctx.fillText(label, w * 0.5, playMode === 'bot' ? h * 0.5 : h * 0.5 + 48);
+
+        if (playMode !== 'bot') {
+          ctx.save();
+          ctx.translate(w * 0.5, h * 0.5 - 48); ctx.rotate(Math.PI);
+          ctx.fillText(label, 0, 0);
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+
+      function gameLoop(now) {
+        if (gameState === 'menu') return;
+        const dt = Math.min((now - lastFrameTime) / 1000, 0.05);
+        lastFrameTime = now;
+
+        if (!isPaused) {
+          vfx.update(dt);
+          if (gameState === 'countdown') {
+            const prevStep = Math.ceil(countdownTimer / 0.8);
+            countdownTimer -= dt;
+            const newStep = Math.ceil(countdownTimer / 0.8);
+            if (newStep !== prevStep && newStep > 0) sound.playCountdown(false);
+            if (countdownTimer <= 0) { gameState = 'playing'; sound.playCountdown(true); }
+          } else if (gameState === 'roundPause') {
+            roundPauseTimer -= dt;
+            if (roundPauseTimer <= 0) {
+              if (pendingAction) { pendingAction(); pendingAction = null; }
+              gameState = 'playing';
+            }
+          } else if (gameState === 'playing' && activeGameEngine) {
+            if (playMode === 'bot') botAI.update(dt, selectedGameId, activeGameEngine, canvasW, canvasH, directTouch, joystickCtrl);
+            if (directTouch.enabled) directTouch.step(dt);
+            if (joystickCtrl.enabled) joystickCtrl.step(dt);
+
+            if (selectedGameId === 'airhockey') activeGameEngine.update(dt, canvasW, canvasH, directTouch, handlePointOrRound);
+            else if (selectedGameId === 'pong') activeGameEngine.update(dt, canvasW, canvasH, directTouch, handlePointOrRound);
+            else if (selectedGameId === 'sumo') activeGameEngine.update(dt, canvasW, canvasH, joystickCtrl, handlePointOrRound);
+            else if (selectedGameId === 'tron') activeGameEngine.update(dt, canvasW, canvasH, joystickCtrl, handlePointOrRound);
+            else if (selectedGameId === 'paint') {
+              activeGameEngine.update(dt, canvasW, canvasH, directTouch, () => {
+                const winner = activeGameEngine.p1Pct > activeGameEngine.p2Pct ? 1 : (activeGameEngine.p2Pct > activeGameEngine.p1Pct ? 2 : 0);
+                showMatchResult(winner);
+              });
+            }
+          }
+        }
+
+        ctx.save();
+        vfx.applyShake(ctx);
+        if (activeGameEngine) activeGameEngine.render(ctx, canvasW, canvasH);
+        renderInGameHUD(ctx, canvasW, canvasH);
+        vfx.render(ctx, canvasW, canvasH);
+        if (joystickCtrl.enabled) joystickCtrl.render(ctx);
+        renderCountdownOverlay(ctx, canvasW, canvasH);
+        ctx.restore();
+
+        animFrameId = requestAnimationFrame(gameLoop);
+      }
+
+      /* =========================================================================
+       * 18. DYNAMIC UI BUILDERS (APP THEME, LANGUAGE, SELECTED GAME & SETTINGS)
+       * ========================================================================= */
       function applyAppTheme(themeId) {
         currentAppTheme = themeId;
-        const root = document.documentElement;
-        root.className = `theme-${themeId}`;
-        const badge = document.getElementById('activeThemeBadge');
-        if (badge) badge.textContent = t(`theme_${themeId}`);
-        renderAppThemeButtons();
-        renderModeUI();
-        renderSelectedGameSummary();
-        updateStartButtonUI();
-        syncSoundUI();
+        const htmlEl = document.documentElement;
+        APP_THEMES.forEach(th => htmlEl.classList.remove('theme-' + th.id));
+        htmlEl.classList.add('theme-' + themeId);
       }
 
       function renderAppThemeButtons() {
         const grid = document.getElementById('appThemeButtonsGrid');
-        if (!grid) return;
         grid.innerHTML = '';
-
-        for (const th of APP_THEMES) {
-          const isSel = currentAppTheme === th.id;
+        APP_THEMES.forEach(th => {
+          const isSelected = currentAppTheme === th.id;
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.className = `px-2.5 py-2 rounded-xl text-[11px] font-bold transition-all cursor-pointer border flex items-center gap-1.5 ${
-            isSel
-              ? 'theme-btn-solid border-transparent'
+          btn.className = `px-2.5 py-2 rounded-xl text-[11px] font-bold border transition-all cursor-pointer flex items-center gap-2 ${
+            isSelected
+              ? 'theme-btn-solid border-transparent shadow-sm'
               : 'theme-btn-surface'
           }`;
-          btn.innerHTML = `
-            <span class="w-3 h-3 rounded-full shrink-0 border border-white/60 shadow-sm" style="background:${th.swatch}"></span>
-            <span class="truncate">${t(`theme_${th.id}`)}</span>
-          `;
+
+          const dot = document.createElement('span');
+          dot.className = 'w-3 h-3 rounded-full shrink-0 border border-black/20';
+          dot.style.backgroundColor = th.swatch;
+
+          const label = document.createElement('span');
+          label.className = 'truncate';
+          label.textContent = t('theme_' + th.id);
+
+          btn.appendChild(dot);
+          btn.appendChild(label);
+
           btn.addEventListener('click', () => {
             sound.playSelect();
             applyAppTheme(th.id);
+            renderAllUI();
           });
           grid.appendChild(btn);
-        }
+        });
       }
 
       function renderLanguageButtons() {
         const grid = document.getElementById('languageButtonsGrid');
-        if (!grid) return;
         grid.innerHTML = '';
-
-        for (const lang of LANGUAGES) {
-          const isSel = currentLang === lang.code;
+        LANGUAGES.forEach(lang => {
+          const isSelected = currentLang === lang.code;
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.className = `px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer border text-left truncate ${
-            isSel
-              ? 'theme-btn-solid border-transparent'
+          btn.className = `px-2.5 py-2 rounded-xl text-[11px] font-bold border transition-all cursor-pointer text-left truncate ${
+            isSelected
+              ? 'theme-btn-solid border-transparent shadow-sm'
               : 'theme-btn-surface'
           }`;
           btn.textContent = lang.label;
           btn.addEventListener('click', () => {
-            sound.playSelect();
             currentLang = lang.code;
-            document.documentElement.lang = lang.code;
-            applyLanguageUI();
+            sound.playSelect();
+            renderAllUI();
           });
           grid.appendChild(btn);
+        });
+      }
+
+      function renderBotDifficultyButtons() {
+        const container = document.getElementById('botDiffButtons');
+        container.innerHTML = '';
+        const levels = ['easy', 'medium', 'hard', 'expert', 'impossible'];
+        levels.forEach(lvl => {
+          const isSel = botDifficulty === lvl;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = `px-2 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+            isSel ? 'theme-btn-solid' : 'text-theme-secondary hover:text-theme-primary'
+          }`;
+          btn.textContent = t('diff_' + lvl);
+          btn.addEventListener('click', () => {
+            botDifficulty = lvl;
+            sound.playSelect();
+            renderAllUI();
+          });
+          container.appendChild(btn);
+        });
+      }
+
+      function renderSelectedGameSummary() {
+        const game = GAMES_CATALOG.find(g => g.id === selectedGameId) || GAMES_CATALOG[0];
+        const theme = getActiveTheme(selectedGameId);
+        const s = userGameSettings[selectedGameId];
+        const card = document.getElementById('selectedGameSummaryCard');
+
+        card.innerHTML = `
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border shadow-sm"
+               style="background: ${rgba(theme.line, 0.14)}; border-color: ${rgba(theme.line, 0.35)}; color: ${theme.line};">
+            ${game.iconSvg}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2">
+              <h2 class="font-display text-sm sm:text-base font-extrabold text-theme-primary truncate">
+                ${t(game.titleKey)}
+              </h2>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider shrink-0 theme-badge border">
+                ${t(game.controlTypeKey)}
+              </span>
+            </div>
+            <p class="text-[11px] text-theme-secondary mt-0.5 line-clamp-1">${t(game.descKey)}</p>
+            <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold theme-badge border">
+                <span class="w-2 h-2 rounded-full" style="background:${theme.line}"></span>
+                ${theme.name}
+              </span>
+              <span class="px-2 py-0.5 rounded-md text-[9px] font-bold theme-badge border">
+                ${t('sh_' + s.vehicleShape)}
+              </span>
+              <span class="px-2 py-0.5 rounded-md text-[9px] font-bold theme-badge border">
+                ${t('vs_' + s.visualStyle)}
+              </span>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderGameSelectCards() {
+        gameCardsContainer.innerHTML = '';
+        GAMES_CATALOG.forEach(game => {
+          const isSelected = game.id === selectedGameId;
+          const activeTheme = getActiveTheme(game.id);
+
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = `w-full text-left rounded-2xl p-3 transition-all flex items-center gap-3 cursor-pointer border-2 ${
+            isSelected ? 'shadow-md' : 'sub-surface hover:brightness-105'
+          }`;
+          if (isSelected) {
+            card.style.backgroundColor = 'var(--card-selected)';
+            card.style.borderColor = 'var(--accent-primary)';
+          } else {
+            card.style.borderColor = 'var(--border-subtle)';
+          }
+
+          card.innerHTML = `
+            <div class="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border"
+                 style="background: ${rgba(activeTheme.line, 0.14)}; border-color: ${rgba(activeTheme.line, 0.35)}; color: ${activeTheme.line};">
+              ${game.iconSvg}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="font-display text-xs sm:text-sm font-bold text-theme-primary truncate">
+                  ${t(game.titleKey)}
+                </h3>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider shrink-0 theme-badge border">
+                  ${t(game.controlTypeKey)}
+                </span>
+              </div>
+              <p class="text-[11px] text-theme-secondary mt-0.5 line-clamp-1">${t(game.descKey)}</p>
+              <div class="flex items-center gap-1.5 mt-1">
+                <span class="w-2 h-2 rounded-full" style="background:${activeTheme.line}"></span>
+                <span class="text-[10px] font-semibold text-theme-secondary">${activeTheme.name}</span>
+              </div>
+            </div>
+          `;
+
+          card.addEventListener('click', () => {
+            selectedGameId = game.id;
+            sound.playSelect();
+            gameSelectModal.classList.add('hidden');
+            gameSelectModal.classList.remove('flex');
+            renderAllUI();
+          });
+
+          gameCardsContainer.appendChild(card);
+        });
+      }
+
+      function renderSettingsSchemaInto(containerEl, gameId, isInGamePause = false) {
+        containerEl.innerHTML = '';
+        const game = GAMES_CATALOG.find(g => g.id === gameId);
+        if (!game) return;
+        const currentSettings = userGameSettings[gameId];
+
+        // 1. ARENA THEMES (12 per game)
+        const themeGroup = document.createElement('div');
+        themeGroup.className = 'flex flex-col gap-2';
+        themeGroup.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-theme-primary">${t('arenaTheme')}</span>
+            <span class="text-[10px] font-bold text-theme-accent">${game.themes.length} ${t('specialThemes')}</span>
+          </div>
+        `;
+        const themeGrid = document.createElement('div');
+        themeGrid.className = 'grid grid-cols-2 sm:grid-cols-3 gap-1.5';
+        game.themes.forEach(th => {
+          const isSel = currentSettings.theme === th.id;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = `px-2.5 py-2 rounded-xl text-[11px] font-bold border transition-all cursor-pointer flex items-center gap-2 text-left ${
+            isSel ? 'theme-btn-solid border-transparent shadow-sm' : 'theme-btn-surface'
+          }`;
+
+          const swatch = document.createElement('span');
+          swatch.className = 'w-3.5 h-3.5 rounded-full shrink-0 border border-white/40';
+          swatch.style.background = `linear-gradient(135deg, ${th.p1} 50%, ${th.p2} 50%)`;
+
+          const lbl = document.createElement('span');
+          lbl.className = 'truncate';
+          lbl.textContent = th.name;
+
+          btn.appendChild(swatch);
+          btn.appendChild(lbl);
+
+          btn.addEventListener('click', () => {
+            sound.playSelect();
+            if (isInGamePause) {
+              userGameSettings[gameId].theme = th.id;
+              updateInGameMenuButtonTheme();
+              renderAllUI();
+              renderSettingsSchemaInto(containerEl, gameId, true);
+            } else {
+              openUniversalPreview(gameId, 'theme', th.id, th.name);
+            }
+          });
+          themeGrid.appendChild(btn);
+        });
+        themeGroup.appendChild(themeGrid);
+        containerEl.appendChild(themeGroup);
+
+        // 2. 9 DISTINCT VEHICLE / CRAFT SHAPES
+        const shapeGroup = document.createElement('div');
+        shapeGroup.className = 'flex flex-col gap-2 pt-2.5 border-t border-slate-400/20';
+        shapeGroup.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-theme-primary">${t('vehicleShape')}</span>
+            <span class="text-[10px] font-bold text-theme-accent">9 ${t('shapesCount')}</span>
+          </div>
+        `;
+        const shapeGrid = document.createElement('div');
+        shapeGrid.className = 'grid grid-cols-3 gap-1.5';
+        VEHICLE_SHAPES.forEach(shId => {
+          const isSel = currentSettings.vehicleShape === shId;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = `px-2 py-2 rounded-xl text-[10px] font-bold border transition-all cursor-pointer text-center truncate ${
+            isSel ? 'theme-btn-solid border-transparent shadow-sm' : 'theme-btn-surface'
+          }`;
+          btn.textContent = t('sh_' + shId);
+          btn.addEventListener('click', () => {
+            sound.playSelect();
+            if (isInGamePause) {
+              userGameSettings[gameId].vehicleShape = shId;
+              renderAllUI();
+              renderSettingsSchemaInto(containerEl, gameId, true);
+            } else {
+              openUniversalPreview(gameId, 'vehicleShape', shId, t('sh_' + shId));
+            }
+          });
+          shapeGrid.appendChild(btn);
+        });
+        shapeGroup.appendChild(shapeGrid);
+        containerEl.appendChild(shapeGroup);
+
+        // 3. 9 DISTINCT GRAPHICS / VISUAL STYLES
+        const styleGroup = document.createElement('div');
+        styleGroup.className = 'flex flex-col gap-2 pt-2.5 border-t border-slate-400/20';
+        styleGroup.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-theme-primary">${t('visualStyle')}</span>
+            <span class="text-[10px] font-bold text-theme-accent">9 ${t('stylesCount')}</span>
+          </div>
+        `;
+        const styleGrid = document.createElement('div');
+        styleGrid.className = 'grid grid-cols-3 gap-1.5';
+        VISUAL_STYLES.forEach(vsId => {
+          const isSel = currentSettings.visualStyle === vsId;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = `px-2 py-2 rounded-xl text-[10px] font-bold border transition-all cursor-pointer text-center truncate ${
+            isSel ? 'theme-btn-solid border-transparent shadow-sm' : 'theme-btn-surface'
+          }`;
+          btn.textContent = t('vs_' + vsId);
+          btn.addEventListener('click', () => {
+            sound.playSelect();
+            if (isInGamePause) {
+              userGameSettings[gameId].visualStyle = vsId;
+              renderAllUI();
+              renderSettingsSchemaInto(containerEl, gameId, true);
+            } else {
+              openUniversalPreview(gameId, 'visualStyle', vsId, t('vs_' + vsId));
+            }
+          });
+          styleGrid.appendChild(btn);
+        });
+        styleGroup.appendChild(styleGrid);
+        containerEl.appendChild(styleGroup);
+
+        // 4. GAME-SPECIFIC RULE CONTROLS
+        game.settingsSchema.forEach(setting => {
+          const group = document.createElement('div');
+          group.className = 'flex items-center justify-between gap-2 pt-2.5 border-t border-slate-400/20';
+          const label = document.createElement('span');
+          label.className = 'text-xs font-bold text-theme-secondary';
+          label.textContent = t(setting.labelKey);
+
+          const btnGroup = document.createElement('div');
+          btnGroup.className = 'inline-flex flex-wrap rounded-xl bg-slate-500/15 p-1 border border-slate-400/20 gap-1';
+          setting.options.forEach(opt => {
+            const isSelected = currentSettings[setting.key] === opt.value;
+            const optBtn = document.createElement('button');
+            optBtn.type = 'button';
+            optBtn.className = `px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+              isSelected ? 'theme-btn-solid' : 'text-theme-secondary hover:text-theme-primary'
+            }`;
+            optBtn.textContent = opt.labelNum !== undefined ? `${opt.labelNum} ${t('secSuffix')}` : (opt.labelKey ? t(opt.labelKey) : opt.label);
+            optBtn.addEventListener('click', () => {
+              userGameSettings[gameId][setting.key] = opt.value;
+              if (isInGamePause && gameId === 'sumo' && setting.key === 'joystickType' && joystickCtrl.enabled) {
+                joystickCtrl.mode = opt.value;
+              }
+              sound.playSelect();
+              renderAllUI();
+              renderSettingsSchemaInto(containerEl, gameId, isInGamePause);
+            });
+            btnGroup.appendChild(optBtn);
+          });
+          group.appendChild(label);
+          group.appendChild(btnGroup);
+          containerEl.appendChild(group);
+        });
+      }
+
+      function syncSoundUI() {
+        const pct = Math.round(sound.volume * 100);
+        for (const [onB, offB, row, sl, val] of [
+          [document.getElementById('soundOnBtn'), document.getElementById('soundOffBtn'), document.getElementById('volumeRow'), document.getElementById('volumeSlider'), document.getElementById('volumeValue')],
+          [document.getElementById('pauseSoundOnBtn'), document.getElementById('pauseSoundOffBtn'), document.getElementById('pauseVolumeRow'), document.getElementById('pauseVolumeSlider'), document.getElementById('pauseVolumeValue')]
+        ]) {
+          onB.textContent = t('on'); offB.textContent = t('off');
+          onB.className = `px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${sound.enabled ? 'theme-btn-solid' : 'text-theme-secondary'}`;
+          offB.className = `px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${!sound.enabled ? 'bg-rose-500 text-white shadow' : 'text-theme-secondary'}`;
+          row.classList.toggle('opacity-40', !sound.enabled);
+          row.classList.toggle('pointer-events-none', !sound.enabled);
+          sl.value = String(pct);
+          val.textContent = `%${pct}`;
         }
       }
 
-      function applyLanguageUI() {
+      function renderAllUI() {
+        const activeGame = GAMES_CATALOG.find(g => g.id === selectedGameId) || GAMES_CATALOG[0];
+        const activeTheme = getActiveTheme(selectedGameId);
         const p2Label = playMode === 'bot' ? t('botShort') : t('p2Short');
-        document.getElementById('topModePillText').textContent = `${t('p1Short')} • ${p2Label}`;
+
+        document.documentElement.lang = currentLang;
         document.getElementById('activeLangBadge').textContent = currentLang.toUpperCase();
-        document.getElementById('activeThemeBadge').textContent = t(`theme_${currentAppTheme}`);
+        document.getElementById('activeThemeBadge').textContent = t('theme_' + currentAppTheme);
+        document.getElementById('topModePillText').textContent = `${t('p1Short')} • ${p2Label}`;
         document.getElementById('headerSubtitle').textContent = t('headerSub');
-        document.getElementById('settingsBtnLabel').textContent = t('settings');
-        document.getElementById('settingsModalTitle').textContent = t('settings');
-        document.getElementById('settingsModalTag').textContent = t('controlCenter');
-        document.getElementById('selectedGameSettingsTag').textContent = t('selectedGameSettings');
+
         document.getElementById('opponentModeLabel').textContent = t('opponentMode');
-        document.getElementById('mode2PBtn').textContent = t('twoPlayer');
-        document.getElementById('modeBotBtn').textContent = t('vsBot');
-        document.getElementById('botDiffLabel').textContent = t('botDifficulty');
+        const m2p = document.getElementById('mode2PBtn');
+        const mbot = document.getElementById('modeBotBtn');
+        m2p.textContent = t('twoPlayer'); mbot.textContent = t('vsBot');
+        m2p.className = `px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${playMode === '2p' ? 'theme-btn-solid' : 'text-theme-secondary'}`;
+        mbot.className = `px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${playMode === 'bot' ? 'theme-btn-solid' : 'text-theme-secondary'}`;
+
+        const diffRow = document.getElementById('botDifficultyRow');
+        if (playMode === 'bot') {
+          diffRow.classList.remove('hidden');
+          document.getElementById('botDiffLabel').textContent = t('botDifficulty');
+          renderBotDifficultyButtons();
+        } else {
+          diffRow.classList.add('hidden');
+        }
+
         document.getElementById('activeGameTag').textContent = t('activeGameTag');
-        document.getElementById('selectGameBtnLabel').textContent = t('selectGameBtn');
         document.getElementById('gamesCountBadge').textContent = t('gamesCount');
-        document.getElementById('gameSelectModalTag').textContent = t('gameSelectTag');
-        document.getElementById('gameSelectModalTitle').textContent = t('gameSelectTitle');
+        document.getElementById('selectGameBtnLabel').textContent = t('selectGameBtn');
+        renderSelectedGameSummary();
+
         document.getElementById('startBtnMainText').textContent = t('start');
+        document.getElementById('startBtnSubtitle').textContent = `${t(activeGame.titleKey)} • ${activeTheme.name}`;
+        document.getElementById('settingsBtnLabel').textContent = t('settings');
+
+        document.getElementById('footerP1Dot').style.backgroundColor = activeTheme.p1;
+        document.getElementById('footerP1Dot').style.boxShadow = `0 0 8px ${activeTheme.p1}`;
+        document.getElementById('footerP2Dot').style.backgroundColor = activeTheme.p2;
+        document.getElementById('footerP2Dot').style.boxShadow = `0 0 8px ${activeTheme.p2}`;
         document.getElementById('footerP1Text').innerHTML = `<strong class="text-theme-primary">${t('bottomSide')}</strong> ${t('p1Short')}`;
         document.getElementById('footerP2Text').innerHTML = `<strong class="text-theme-primary">${t('topSide')}</strong> ${p2Label}`;
 
+        document.getElementById('gameSelectModalTag').textContent = t('gameSelectTag');
+        document.getElementById('gameSelectModalTitle').textContent = t('gameSelectTitle');
+
+        document.getElementById('settingsModalTag').textContent = t('controlCenter');
+        document.getElementById('settingsModalTitle').textContent = t('settings');
+        document.getElementById('selectedGameSettingsTag').textContent = t('selectedGameSettings');
+        document.getElementById('contextSettingsTitle').textContent = `${t(activeGame.titleKey)} ${t('gameSettingsSuffix')}`;
+        document.getElementById('contextSettingsBadge').style.backgroundColor = activeTheme.line;
+        document.getElementById('contextSettingsBadge').style.boxShadow = `0 0 10px ${activeTheme.line}`;
+
+        document.getElementById('soundSettingsTitle').textContent = t('soundSettings');
+        document.getElementById('volumeLabel').textContent = t('volume');
         document.getElementById('appThemeSectionTitle').querySelector('span').textContent = t('appThemeTitle');
         document.getElementById('langSectionTitle').querySelector('span').textContent = t('langTitle');
-        document.getElementById('soundSettingsTitle').textContent = t('soundSettings');
-        document.getElementById('soundOnBtn').textContent = t('on');
-        document.getElementById('soundOffBtn').textContent = t('off');
-        document.getElementById('volumeLabel').textContent = t('volume');
         document.getElementById('doneSettingsBtn').textContent = t('done');
-
-        document.getElementById('previewBadge').textContent = t('livePreview');
-        document.getElementById('previewHintText').textContent = t('previewHint');
-        document.getElementById('previewCancelBtn').textContent = t('cancel');
-        document.getElementById('previewConfirmBtn').textContent = t('confirmSelect');
 
         document.getElementById('inGameMenuLabel').textContent = t('menu');
         document.getElementById('pauseTag').textContent = t('pausedTag');
         document.getElementById('pauseSoundTitle').textContent = t('soundSettings');
-        document.getElementById('pauseSoundOnBtn').textContent = t('on');
-        document.getElementById('pauseSoundOffBtn').textContent = t('off');
         document.getElementById('pauseVolumeLabel').textContent = t('level');
         document.getElementById('resumeBtn').textContent = t('resume');
         document.getElementById('pauseRestartBtn').textContent = t('restart');
@@ -3651,544 +4605,25 @@
         document.getElementById('replayBtn').textContent = t('playAgain');
         document.getElementById('backToMenuBtn').textContent = t('backToMenu');
 
-        renderModeUI();
-        renderSelectedGameSummary();
-        renderGameCardsModal();
+        syncSoundUI();
+        renderSettingsSchemaInto(document.getElementById('contextSettingsContainer'), selectedGameId, false);
         renderAppThemeButtons();
         renderLanguageButtons();
-        updateStartButtonUI();
-        if (!settingsModal.classList.contains('hidden')) renderSettingsForGame(selectedGameId, contextSettingsContainer, true);
-        if (!pauseModal.classList.contains('hidden')) renderSettingsForGame(selectedGameId, pauseGameSettingsContainer, false);
-      }
-
-      function renderModeUI() {
-        const m2 = document.getElementById('mode2PBtn');
-        const mb = document.getElementById('modeBotBtn');
-        const diffRow = document.getElementById('botDifficultyRow');
-        const diffBtns = document.getElementById('botDiffButtons');
-
-        if (playMode === '2p') {
-          m2.className = 'px-3 py-1.5 rounded-lg text-xs font-bold theme-btn-solid transition-all cursor-pointer';
-          mb.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-theme-secondary hover:text-theme-primary transition-all cursor-pointer';
-          diffRow.classList.add('hidden');
-        } else {
-          mb.className = 'px-3 py-1.5 rounded-lg text-xs font-bold theme-btn-solid transition-all cursor-pointer';
-          m2.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-theme-secondary hover:text-theme-primary transition-all cursor-pointer';
-          diffRow.classList.remove('hidden');
-        }
-
-        const levels = [
-          { id: 'easy', label: t('diff_easy') },
-          { id: 'medium', label: t('diff_medium') },
-          { id: 'hard', label: t('diff_hard') },
-          { id: 'expert', label: t('diff_expert') },
-          { id: 'impossible', label: t('diff_impossible') }
-        ];
-        diffBtns.innerHTML = '';
-        for (const lv of levels) {
-          const isSel = botDifficulty === lv.id;
-          const b = document.createElement('button');
-          b.type = 'button';
-          b.className = `px-2 py-1 rounded-lg text-[10px] font-extrabold transition-all cursor-pointer ${
-            isSel ? 'theme-btn-solid' : 'text-theme-secondary hover:text-theme-primary'
-          }`;
-          b.textContent = lv.label;
-          b.addEventListener('click', () => {
-            sound.playSelect();
-            botDifficulty = lv.id;
-            renderModeUI();
-            updateStartButtonUI();
-          });
-          diffBtns.appendChild(b);
-        }
-      }
-
-      /* Compact Selected Game Card on Home Screen (Themed dynamically!) */
-      function renderSelectedGameSummary() {
-        const game = GAMES_CATALOG.find(g => g.id === selectedGameId) || GAMES_CATALOG[0];
-        const activeTh = getActiveTheme(game.id);
-        const s = userGameSettings[game.id];
-
-        selectedGameSummaryCard.innerHTML = `
-          <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border-2 theme-btn-surface"
-               style="color: var(--accent-primary);">
-            ${game.iconSvg}
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <h2 class="font-bold text-sm sm:text-base text-theme-primary truncate">${t(game.titleKey)}</h2>
-            </div>
-            <p class="text-[11px] text-theme-secondary line-clamp-1 mt-0.5">${t(game.descKey)}</p>
-            <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
-              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold theme-badge border">
-                🎨 ${activeTh.name}
-              </span>
-              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold theme-badge border">
-                ✨ ${t(`vs_${s.visualStyle || 'neon_bloom'}`)}
-              </span>
-            </div>
-          </div>
-        `;
-      }
-
-      /* Game Selection Modal List */
-      function renderGameCardsModal() {
-        gameCardsContainer.innerHTML = '';
-
-        for (const game of GAMES_CATALOG) {
-          const isSelected = game.id === selectedGameId;
-          const activeTh = getActiveTheme(game.id);
-          const card = document.createElement('button');
-          card.type = 'button';
-          card.className = `w-full text-left p-3.5 rounded-2xl transition-all duration-150 flex items-center gap-3 cursor-pointer border-2 ${
-            isSelected ? 'theme-btn-surface' : 'sub-surface hover:brightness-105'
-          }`;
-          card.style.borderColor = isSelected ? 'var(--accent-primary)' : 'var(--border-subtle)';
-
-          card.innerHTML = `
-            <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border theme-btn-surface"
-                 style="color: var(--accent-primary);">
-              ${game.iconSvg}
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between gap-1.5">
-                <h3 class="font-bold text-sm text-theme-primary truncate">${t(game.titleKey)}</h3>
-                <span class="shrink-0 px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wider border theme-badge">
-                  ${t(game.controlTypeKey)}
-                </span>
-              </div>
-              <p class="text-[11px] text-theme-secondary mt-0.5 line-clamp-1">${t(game.descKey)}</p>
-              <div class="flex items-center gap-1.5 mt-1">
-                <span class="w-2 h-2 rounded-full" style="background:${activeTh.line}"></span>
-                <span class="text-[10px] font-semibold text-theme-secondary">${activeTh.name}</span>
-              </div>
-            </div>
-          `;
-
-          card.addEventListener('click', () => {
-            sound.unlock();
-            sound.playSelect();
-            selectedGameId = game.id;
-            renderSelectedGameSummary();
-            renderGameCardsModal();
-            updateStartButtonUI();
-            gameSelectModal.classList.add('hidden');
-            gameSelectModal.classList.remove('flex');
-          });
-
-          gameCardsContainer.appendChild(card);
-        }
-      }
-
-      function updateStartButtonUI() {
-        const game = GAMES_CATALOG.find(g => g.id === selectedGameId) || GAMES_CATALOG[0];
-        const activeTh = getActiveTheme(game.id);
-        const modeTag = playMode === 'bot' ? `${t('vsBot')} (${t('diff_' + botDifficulty)})` : t('twoPlayer');
-
-        startBtnSubtitle.textContent = `${t(game.titleKey)} • ${activeTh.name} • ${modeTag}`;
-
-        const footerP1 = document.getElementById('footerP1Dot');
-        const footerP2 = document.getElementById('footerP2Dot');
-        if (footerP1) { footerP1.style.background = activeTh.p1; footerP1.style.boxShadow = `0 0 8px ${activeTh.p1}`; }
-        if (footerP2) { footerP2.style.background = activeTh.p2; footerP2.style.boxShadow = `0 0 8px ${activeTh.p2}`; }
       }
 
       /* =========================================================================
-       * GAME-SPECIFIC LIVE PREVIEW MODAL (ADAPTS TO SELECTED GAME!)
+       * 19. EVENT WIRING
        * ========================================================================= */
-      function openLivePreview(gameId, category, itemId, itemLabel) {
+      document.getElementById('mode2PBtn').addEventListener('click', () => { playMode = '2p'; sound.playSelect(); renderAllUI(); });
+      document.getElementById('modeBotBtn').addEventListener('click', () => { playMode = 'bot'; sound.playSelect(); renderAllUI(); });
+
+      document.getElementById('openGameSelectBtn').addEventListener('click', () => {
         sound.playSelect();
-        previewState = { gameId, category, itemId, itemLabel };
-        previewTime = 0;
-
-        if (category === 'theme') previewCategoryTag.textContent = t('previewArenaTag');
-        else if (category === 'shape') previewCategoryTag.textContent = t('previewShapeTag');
-        else previewCategoryTag.textContent = t('previewGfxTag');
-
-        previewItemTitle.textContent = itemLabel;
-        universalPreviewModal.classList.remove('hidden');
-        universalPreviewModal.classList.add('flex');
-
-        if (previewRafId) cancelAnimationFrame(previewRafId);
-        let prevTs = performance.now();
-        const loop = (now) => {
-          const dt = Math.min(0.05, (now - prevTs) / 1000);
-          prevTs = now;
-          previewTime += dt;
-          renderUniversalPreviewCanvas();
-          previewRafId = requestAnimationFrame(loop);
-        };
-        previewRafId = requestAnimationFrame(loop);
-      }
-
-      function closeLivePreview() {
-        universalPreviewModal.classList.add('hidden');
-        universalPreviewModal.classList.remove('flex');
-        if (previewRafId) { cancelAnimationFrame(previewRafId); previewRafId = null; }
-        previewState = null;
-      }
-
-      function renderUniversalPreviewCanvas() {
-        if (!previewState) return;
-        const rect = universalPreviewCanvas.getBoundingClientRect();
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const w = Math.max(240, rect.width || 300);
-        const h = Math.max(150, rect.height || 200);
-        if (universalPreviewCanvas.width !== Math.round(w * dpr) || universalPreviewCanvas.height !== Math.round(h * dpr)) {
-          universalPreviewCanvas.width = Math.round(w * dpr);
-          universalPreviewCanvas.height = Math.round(h * dpr);
-        }
-
-        const c = universalPreviewCtx;
-        c.save();
-        c.scale(dpr, dpr);
-
-        const gId = previewState.gameId;
-        const game = GAMES_CATALOG.find(g => g.id === gId) || GAMES_CATALOG[0];
-        const currentSettings = userGameSettings[gId];
-
-        const theme = previewState.category === 'theme'
-          ? (game.themes.find(th => th.id === previewState.itemId) || game.themes[0])
-          : getActiveTheme(gId);
-        const shape = previewState.category === 'shape' ? previewState.itemId : (currentSettings.vehicleShape || 'classic_disc');
-        const visualStyle = previewState.category === 'visualStyle' ? previewState.itemId : (currentSettings.visualStyle || 'neon_bloom');
-
-        renderArenaBackdrop(c, w, h, theme, visualStyle, previewTime);
-
-        // Draw Game-Specific Arena & Gameplay Action inside Preview!
-        if (gId === 'airhockey') {
-          // Hockey Rink lines + Mallets + Bouncing Puck
-          c.strokeStyle = rgba(theme.line, 0.35);
-          c.lineWidth = 3;
-          c.strokeRect(8, 8, w - 16, h - 16);
-          c.beginPath(); c.moveTo(w * 0.5, 8); c.lineTo(w * 0.5, h - 8); c.stroke();
-          c.beginPath(); c.arc(w * 0.5, h * 0.5, 28, 0, Math.PI * 2); c.stroke();
-
-          const p1x = w * 0.24 + Math.cos(previewTime * 2.4) * 18;
-          const p1y = h * 0.5 + Math.sin(previewTime * 3.1) * 32;
-          const p2x = w * 0.76 - Math.cos(previewTime * 2.4) * 18;
-          const p2y = h * 0.5 - Math.sin(previewTime * 3.1) * 32;
-          const puckX = w * 0.5 + Math.sin(previewTime * 3.8) * (w * 0.22);
-          const puckY = h * 0.5 + Math.cos(previewTime * 2.9) * 34;
-
-          c.fillStyle = theme.accent;
-          c.beginPath(); c.arc(puckX, puckY, 10, 0, Math.PI * 2); c.fill();
-
-          renderStyledCraft(c, { x: p1x, y: p1y, radius: 22, color: theme.p1, shape, visualStyle, angle: 0, time: previewTime });
-          renderStyledCraft(c, { x: p2x, y: p2y, radius: 22, color: theme.p2, shape, visualStyle, angle: Math.PI, time: previewTime });
-
-        } else if (gId === 'sumo') {
-          // Circular Dohyo Ring + Clashing Sumo Crafts + Shockwave
-          const ringR = Math.min(w, h) * 0.42;
-          c.strokeStyle = theme.line;
-          c.lineWidth = 3.5;
-          c.beginPath(); c.arc(w * 0.5, h * 0.5, safeR(ringR), 0, Math.PI * 2); c.stroke();
-
-          const clash = Math.abs(Math.sin(previewTime * 2.6));
-          const p1x = w * 0.5 - 24 - clash * 24;
-          const p2x = w * 0.5 + 24 + clash * 24;
-          if (clash < 0.22) {
-            c.strokeStyle = rgba(theme.accent, 0.7);
-            c.lineWidth = 2.5;
-            c.beginPath(); c.arc(w * 0.5, h * 0.5, safeR(20 + (0.22 - clash) * 140), 0, Math.PI * 2); c.stroke();
-          }
-
-          renderStyledCraft(c, { x: p1x, y: h * 0.5, radius: 24, color: theme.p1, shape, visualStyle, angle: 0, time: previewTime, isDashing: clash < 0.25 });
-          renderStyledCraft(c, { x: p2x, y: h * 0.5, radius: 24, color: theme.p2, shape, visualStyle, angle: Math.PI, time: previewTime });
-
-        } else if (gId === 'tron') {
-          // Light-Cycles weaving with glowing trails
-          const p1x = w * 0.32 + Math.sin(previewTime * 2.2) * 28;
-          const p1y = h * 0.5 + Math.cos(previewTime * 1.7) * 36;
-          const p2x = w * 0.68 - Math.sin(previewTime * 2.2) * 28;
-          const p2y = h * 0.5 - Math.cos(previewTime * 1.7) * 36;
-
-          c.strokeStyle = theme.p1; c.lineWidth = 5; c.lineCap = 'round';
-          c.beginPath();
-          for (let i = 0; i <= 14; i++) {
-            const tt = previewTime - i * 0.06;
-            const tx = w * 0.32 + Math.sin(tt * 2.2) * 28;
-            const ty = h * 0.5 + Math.cos(tt * 1.7) * 36;
-            if (i === 0) c.moveTo(tx, ty); else c.lineTo(tx, ty);
-          }
-          c.stroke();
-
-          c.strokeStyle = theme.p2;
-          c.beginPath();
-          for (let i = 0; i <= 14; i++) {
-            const tt = previewTime - i * 0.06;
-            const tx = w * 0.68 - Math.sin(tt * 2.2) * 28;
-            const ty = h * 0.5 - Math.cos(tt * 1.7) * 36;
-            if (i === 0) c.moveTo(tx, ty); else c.lineTo(tx, ty);
-          }
-          c.stroke();
-
-          renderStyledCraft(c, { x: p1x, y: p1y, radius: 15, color: theme.p1, shape, visualStyle, angle: previewTime * 2, time: previewTime });
-          renderStyledCraft(c, { x: p2x, y: p2y, radius: 15, color: theme.p2, shape, visualStyle, angle: -previewTime * 2, time: previewTime });
-
-        } else if (gId === 'pong') {
-          // Curved Plasma Tennis Shields + Bouncing Curve Ball
-          const p1y = h * 0.5 + Math.sin(previewTime * 2.7) * 38;
-          const p2y = h * 0.5 - Math.sin(previewTime * 2.7) * 38;
-          const bx = w * 0.5 + Math.sin(previewTime * 3.4) * (w * 0.30);
-          const by = h * 0.5 + Math.sin(previewTime * 6.8) * 26;
-
-          c.fillStyle = '#ffffff';
-          c.beginPath(); c.arc(bx, by, 9, 0, Math.PI * 2); c.fill();
-
-          // Left & Right Styled Shields
-          for (const side of [{ x: 26, y: p1y, col: theme.p1 }, { x: w - 26, y: p2y, col: theme.p2 }]) {
-            c.save();
-            c.translate(side.x, side.y);
-            c.fillStyle = rgba(side.col, 0.35);
-            c.strokeStyle = side.col;
-            c.lineWidth = 3;
-            c.beginPath(); c.roundRect(-7, -28, 14, 56, 7); c.fill(); c.stroke();
-            c.restore();
-          }
-          renderStyledCraft(c, { x: w * 0.5, y: h * 0.5, radius: 16, color: theme.accent, shape, visualStyle, angle: previewTime * 3, time: previewTime });
-
-        } else {
-          // Paint War: Splashed Territory + Paint Drones
-          const p1x = w * 0.34 + Math.cos(previewTime * 2.5) * 34;
-          const p1y = h * 0.5 + Math.sin(previewTime * 3.2) * 30;
-          const p2x = w * 0.66 - Math.cos(previewTime * 2.5) * 34;
-          const p2y = h * 0.5 - Math.sin(previewTime * 3.2) * 30;
-
-          c.fillStyle = rgba(theme.p1, 0.25);
-          c.beginPath(); c.arc(p1x, p1y, 44, 0, Math.PI * 2); c.fill();
-          c.fillStyle = rgba(theme.p2, 0.25);
-          c.beginPath(); c.arc(p2x, p2y, 44, 0, Math.PI * 2); c.fill();
-
-          renderStyledCraft(c, { x: p1x, y: p1y, radius: 22, color: theme.p1, shape, visualStyle, angle: previewTime, time: previewTime });
-          renderStyledCraft(c, { x: p2x, y: p2y, radius: 22, color: theme.p2, shape, visualStyle, angle: -previewTime, time: previewTime });
-        }
-
-        renderVisualPostOverlay(c, w, h, visualStyle);
-        c.restore();
-      }
-
-      previewCancelBtn.addEventListener('click', () => {
-        sound.playSelect();
-        closeLivePreview();
-      });
-
-      previewConfirmBtn.addEventListener('click', () => {
-        if (!previewState) return;
-        sound.playPowerup();
-        const { gameId, category, itemId } = previewState;
-        if (category === 'theme') userGameSettings[gameId].theme = itemId;
-        else if (category === 'shape') userGameSettings[gameId].vehicleShape = itemId;
-        else if (category === 'visualStyle') userGameSettings[gameId].visualStyle = itemId;
-
-        closeLivePreview();
-        renderSelectedGameSummary();
-        renderGameCardsModal();
-        updateStartButtonUI();
-        renderSettingsForGame(selectedGameId, contextSettingsContainer, true);
-        if (!pauseModal.classList.contains('hidden')) {
-          renderSettingsForGame(selectedGameId, pauseGameSettingsContainer, false);
-        }
-      });
-
-      /* =========================================================================
-       * GAME-SPECIFIC SETTINGS BUILDER
-       * ========================================================================= */
-      function renderSettingsForGame(gameId, targetContainer, isMainModal) {
-        const game = GAMES_CATALOG.find(g => g.id === gameId) || GAMES_CATALOG[0];
-        const current = userGameSettings[gameId];
-
-        if (isMainModal) {
-          contextSettingsTitle.textContent = `${t(game.titleKey)} ${t('gameSettingsSuffix')}`;
-          contextSettingsBadge.style.background = game.accent;
-          contextSettingsBadge.style.boxShadow = `0 0 10px ${game.accent}`;
-        }
-
-        targetContainer.innerHTML = '';
-
-        // 1. Game Rules Options
-        for (const item of game.settingsSchema) {
-          const row = document.createElement('div');
-          row.className = 'flex flex-col gap-1.5';
-
-          const lbl = document.createElement('span');
-          lbl.className = 'text-xs font-bold text-theme-secondary';
-          lbl.textContent = t(item.labelKey);
-          row.appendChild(lbl);
-
-          const btnGroup = document.createElement('div');
-          btnGroup.className = 'grid gap-1.5';
-          btnGroup.style.gridTemplateColumns = `repeat(${item.options.length}, minmax(0, 1fr))`;
-
-          for (const opt of item.options) {
-            const isActive = current[item.key] === opt.value;
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = `py-2 px-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-              isActive
-                ? 'theme-btn-solid border-transparent'
-                : 'theme-btn-surface'
-            }`;
-            btn.textContent = opt.labelNum ? `${opt.labelNum} ${t('secSuffix')}` : (opt.labelKey ? t(opt.labelKey) : opt.label);
-
-            btn.addEventListener('click', () => {
-              sound.playSelect();
-              userGameSettings[gameId][item.key] = opt.value;
-              renderSettingsForGame(gameId, targetContainer, isMainModal);
-            });
-
-            btnGroup.appendChild(btn);
-          }
-
-          row.appendChild(btnGroup);
-          targetContainer.appendChild(row);
-        }
-
-        // 2. Arena Theme Selector (12 Distinct Themes per Game with Game-Specific Preview)
-        const themeBlock = document.createElement('div');
-        themeBlock.className = 'flex flex-col gap-2 pt-2.5 border-t border-slate-400/20';
-        const themeHeader = document.createElement('div');
-        themeHeader.className = 'flex items-center justify-between';
-        themeHeader.innerHTML = `
-          <span class="text-xs font-bold text-theme-primary">${t('arenaTheme')}</span>
-          <span class="text-[10px] font-bold text-theme-accent">12 ${t('specialThemes')}</span>
-        `;
-        themeBlock.appendChild(themeHeader);
-
-        const themeGrid = document.createElement('div');
-        themeGrid.className = 'grid grid-cols-3 gap-1.5';
-        for (const th of game.themes) {
-          const isThSelected = current.theme === th.id;
-          const tBtn = document.createElement('button');
-          tBtn.type = 'button';
-          tBtn.className = `p-2 rounded-xl text-left transition-all cursor-pointer border flex flex-col gap-1.5 ${
-            isThSelected
-              ? 'theme-btn-solid border-transparent'
-              : 'theme-btn-surface'
-          }`;
-          tBtn.innerHTML = `
-            <div class="flex items-center gap-1">
-              <span class="w-2.5 h-2.5 rounded-full border border-white/50" style="background:${th.bg}"></span>
-              <span class="w-2.5 h-2.5 rounded-full" style="background:${th.p1}"></span>
-              <span class="w-2.5 h-2.5 rounded-full" style="background:${th.p2}"></span>
-            </div>
-            <span class="text-[10px] font-bold leading-tight truncate">
-              ${th.name}
-            </span>
-          `;
-          tBtn.addEventListener('click', () => openLivePreview(gameId, 'theme', th.id, th.name));
-          themeGrid.appendChild(tBtn);
-        }
-        themeBlock.appendChild(themeGrid);
-        targetContainer.appendChild(themeBlock);
-
-        // 3. Vehicle & Object Shape Selector (Game-Adaptive Preview)
-        const shapeBlock = document.createElement('div');
-        shapeBlock.className = 'flex flex-col gap-2 pt-2.5 border-t border-slate-400/20';
-        const shapeHeader = document.createElement('div');
-        shapeHeader.className = 'flex items-center justify-between';
-        shapeHeader.innerHTML = `
-          <span class="text-xs font-bold text-theme-primary">${t('vehicleShape')}</span>
-          <span class="text-[10px] font-bold text-theme-accent">9 ${t('shapesCount')}</span>
-        `;
-        shapeBlock.appendChild(shapeHeader);
-
-        const shapeGrid = document.createElement('div');
-        shapeGrid.className = 'grid grid-cols-3 gap-1.5';
-        for (const shId of VEHICLE_SHAPES) {
-          const isShSel = (current.vehicleShape || 'classic_disc') === shId;
-          const shLabel = t(`sh_${shId}`);
-          const sBtn = document.createElement('button');
-          sBtn.type = 'button';
-          sBtn.className = `py-2 px-2 rounded-xl text-center transition-all cursor-pointer border text-[10px] font-bold truncate ${
-            isShSel
-              ? 'theme-btn-solid border-transparent'
-              : 'theme-btn-surface'
-          }`;
-          sBtn.textContent = shLabel;
-          sBtn.addEventListener('click', () => openLivePreview(gameId, 'shape', shId, shLabel));
-          shapeGrid.appendChild(sBtn);
-        }
-        shapeBlock.appendChild(shapeGrid);
-        targetContainer.appendChild(shapeBlock);
-
-        // 4. Distinct Visual & Graphics Style Selector (9 Styles with Preview)
-        const vsBlock = document.createElement('div');
-        vsBlock.className = 'flex flex-col gap-2 pt-2.5 border-t border-slate-400/20';
-        const vsHeader = document.createElement('div');
-        vsHeader.className = 'flex items-center justify-between';
-        vsHeader.innerHTML = `
-          <span class="text-xs font-bold text-theme-primary">${t('visualStyle')}</span>
-          <span class="text-[10px] font-bold text-theme-accent">9 ${t('stylesCount')}</span>
-        `;
-        vsBlock.appendChild(vsHeader);
-
-        const vsGrid = document.createElement('div');
-        vsGrid.className = 'grid grid-cols-3 gap-1.5';
-        for (const vsId of VISUAL_STYLES) {
-          const isVsSel = (current.visualStyle || 'neon_bloom') === vsId;
-          const vsLabel = t(`vs_${vsId}`);
-          const vBtn = document.createElement('button');
-          vBtn.type = 'button';
-          vBtn.className = `py-2 px-2 rounded-xl text-center transition-all cursor-pointer border text-[10px] font-bold truncate ${
-            isVsSel
-              ? 'theme-btn-solid border-transparent'
-              : 'theme-btn-surface'
-          }`;
-          vBtn.textContent = vsLabel;
-          vBtn.addEventListener('click', () => openLivePreview(gameId, 'visualStyle', vsId, vsLabel));
-          vsGrid.appendChild(vBtn);
-        }
-        vsBlock.appendChild(vsGrid);
-        targetContainer.appendChild(vsBlock);
-      }
-
-      /* =========================================================================
-       * MODAL CONTROLS & SOUND SYNC
-       * ========================================================================= */
-      function syncSoundUI() {
-        const activeClass = 'px-3 py-1 rounded-lg text-xs font-bold theme-btn-solid transition-all cursor-pointer';
-        const inactiveClass = 'px-3 py-1 rounded-lg text-xs font-bold text-theme-secondary hover:text-theme-primary transition-all cursor-pointer';
-
-        soundOnBtn.className = sound.enabled ? activeClass : inactiveClass;
-        soundOffBtn.className = !sound.enabled ? activeClass : inactiveClass;
-        pauseSoundOnBtn.className = sound.enabled ? activeClass : inactiveClass;
-        pauseSoundOffBtn.className = !sound.enabled ? activeClass : inactiveClass;
-
-        const pct = Math.round(sound.volume * 100);
-        volumeSlider.value = pct; volumeValue.textContent = `%${pct}`;
-        volumeRow.style.opacity = sound.enabled ? '1' : '0.4'; volumeRow.style.pointerEvents = sound.enabled ? 'auto' : 'none';
-
-        pauseVolumeSlider.value = pct; pauseVolumeValue.textContent = `%${pct}`;
-        pauseVolumeRow.style.opacity = sound.enabled ? '1' : '0.4'; pauseVolumeRow.style.pointerEvents = sound.enabled ? 'auto' : 'none';
-      }
-
-      soundOnBtn.addEventListener('click', () => { sound.enabled = true; sound.unlock(); sound.playSelect(); syncSoundUI(); });
-      soundOffBtn.addEventListener('click', () => { sound.enabled = false; syncSoundUI(); });
-      volumeSlider.addEventListener('input', (e) => { sound.volume = clamp(Number(e.target.value) / 100, 0, 1); syncSoundUI(); });
-      volumeSlider.addEventListener('change', () => { sound.unlock(); sound.playSelect(); });
-
-      pauseSoundOnBtn.addEventListener('click', () => { sound.enabled = true; sound.unlock(); sound.playSelect(); syncSoundUI(); });
-      pauseSoundOffBtn.addEventListener('click', () => { sound.enabled = false; syncSoundUI(); });
-      pauseVolumeSlider.addEventListener('input', (e) => { sound.volume = clamp(Number(e.target.value) / 100, 0, 1); syncSoundUI(); });
-      pauseVolumeSlider.addEventListener('change', () => { sound.unlock(); sound.playSelect(); });
-
-      // Opponent Mode Toggles
-      document.getElementById('mode2PBtn').addEventListener('click', () => {
-        sound.playSelect(); playMode = '2p'; applyLanguageUI();
-      });
-      document.getElementById('modeBotBtn').addEventListener('click', () => {
-        sound.playSelect(); playMode = 'bot'; applyLanguageUI();
-      });
-
-      // Game Selection Modal Triggers
-      openGameSelectBtn.addEventListener('click', () => {
-        sound.unlock(); sound.playSelect();
-        renderGameCardsModal();
+        renderGameSelectCards();
         gameSelectModal.classList.remove('hidden');
         gameSelectModal.classList.add('flex');
       });
-      closeGameSelectBtn.addEventListener('click', () => {
+      document.getElementById('closeGameSelectBtn').addEventListener('click', () => {
         sound.playSelect();
         gameSelectModal.classList.add('hidden');
         gameSelectModal.classList.remove('flex');
@@ -4200,506 +4635,51 @@
         }
       });
 
-      // Settings Modal Triggers (Opens directly to Selected Game's Settings!)
-      function openSettingsModal() {
-        sound.unlock(); sound.playSelect();
-        syncSoundUI();
-        renderSettingsForGame(selectedGameId, contextSettingsContainer, true);
-        renderAppThemeButtons();
-        renderLanguageButtons();
+      document.getElementById('openSettingsBtn').addEventListener('click', () => {
+        sound.playSelect();
+        renderAllUI();
         settingsModal.classList.remove('hidden');
         settingsModal.classList.add('flex');
-      }
-      function closeSettingsModal() {
+      });
+      document.getElementById('closeSettingsBtn').addEventListener('click', () => {
         sound.playSelect();
         settingsModal.classList.add('hidden');
         settingsModal.classList.remove('flex');
-      }
-      openSettingsBtn.addEventListener('click', openSettingsModal);
-      closeSettingsBtn.addEventListener('click', closeSettingsModal);
-      doneSettingsBtn.addEventListener('click', closeSettingsModal);
-      settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) closeSettingsModal(); });
-
-      /* =========================================================================
-       * MULTI-STAGE LOOPING GAME-SPECIFIC PREVIEW ANIMATIONS ABOVE "DUO ARENA"
-       * ========================================================================= */
-      function startHeroFxLoop() {
-        if (heroFxRafId) cancelAnimationFrame(heroFxRafId);
-        let prev = performance.now();
-        const step = (now) => {
-          const dt = Math.min(0.05, (now - prev) / 1000);
-          prev = now;
-          heroFxTime += dt;
-          renderHeroFx();
-          heroFxRafId = requestAnimationFrame(step);
-        };
-        heroFxRafId = requestAnimationFrame(step);
-      }
-
-      function renderHeroFx() {
-        if (menuView.classList.contains('hidden')) return;
-        const rect = heroFxCanvas.getBoundingClientRect();
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const w = Math.max(120, rect.width || 300);
-        const h = Math.max(36, rect.height || 54);
-        if (heroFxCanvas.width !== Math.round(w * dpr) || heroFxCanvas.height !== Math.round(h * dpr)) {
-          heroFxCanvas.width = Math.round(w * dpr);
-          heroFxCanvas.height = Math.round(h * dpr);
-        }
-        const c = heroFxCtx;
-        c.save();
-        c.scale(dpr, dpr);
-
-        const gId = selectedGameId;
-        const th = getActiveTheme(gId);
-        const s = userGameSettings[gId];
-        const shape = s.vehicleShape || 'classic_disc';
-        const visualStyle = s.visualStyle || 'neon_bloom';
-
-        // 3 distinct phases per game, cycling smoothly every 2.4 seconds (7.2s full loop)
-        const cycleDuration = 7.2;
-        const loopPos = heroFxTime % cycleDuration;
-        const phase = Math.floor(loopPos / 2.4); // 0, 1, or 2
-        const phaseT = (loopPos % 2.4) / 2.4;    // 0.0 -> 1.0
-
-        renderArenaBackdrop(c, w, h, th, visualStyle, heroFxTime);
-
-        if (gId === 'airhockey') {
-          c.strokeStyle = rgba(th.line, 0.35);
-          c.lineWidth = 1.5;
-          c.beginPath(); c.moveTo(w * 0.5, 4); c.lineTo(w * 0.5, h - 4); c.stroke();
-          c.beginPath(); c.arc(w * 0.5, h * 0.5, 14, 0, Math.PI * 2); c.stroke();
-
-          const p1y = h * 0.5 + Math.sin(heroFxTime * 4.5) * 12;
-          const p2y = h * 0.5 - Math.sin(heroFxTime * 4.5) * 12;
-
-          if (phase === 0) {
-            // Phase 1: Fast curving rally with trail
-            const bx = w * 0.5 + Math.sin(phaseT * Math.PI * 4) * (w * 0.34);
-            const by = h * 0.5 + Math.cos(phaseT * Math.PI * 6) * 14;
-            c.strokeStyle = rgba(th.accent, 0.45); c.lineWidth = 3;
-            c.beginPath(); c.moveTo(bx - 16, by); c.lineTo(bx, by); c.stroke();
-            c.fillStyle = th.accent; c.beginPath(); c.arc(bx, by, 5, 0, Math.PI * 2); c.fill();
-            renderStyledCraft(c, { x: 24, y: p1y, radius: 9.5, color: th.p1, shape, visualStyle, angle: 0, time: heroFxTime });
-            renderStyledCraft(c, { x: w - 24, y: p2y, radius: 9.5, color: th.p2, shape, visualStyle, angle: Math.PI, time: heroFxTime });
-          } else if (phase === 1) {
-            // Phase 2: 3X Triple Puck split!
-            for (let k = -1; k <= 1; k++) {
-              const bx = w * 0.5 + Math.sin(phaseT * Math.PI * 3 + k * 0.8) * (w * 0.32);
-              const by = h * 0.5 + k * 11 * Math.sin(phaseT * Math.PI);
-              c.fillStyle = k === 0 ? '#ffbe0b' : th.accent;
-              c.beginPath(); c.arc(bx, by, 4.5, 0, Math.PI * 2); c.fill();
-            }
-            renderStyledCraft(c, { x: 24, y: p1y, radius: 9.5, color: th.p1, shape, visualStyle, angle: 0, time: heroFxTime });
-            renderStyledCraft(c, { x: w - 24, y: p2y, radius: 9.5, color: th.p2, shape, visualStyle, angle: Math.PI, time: heroFxTime });
-          } else {
-            // Phase 3: Giant Mallet Power-Smash Goal!
-            const smashX = 24 + Math.sin(phaseT * Math.PI) * 28;
-            const bx = clamp(smashX + 12 + phaseT * (w - 30), 20, w - 10);
-            c.fillStyle = th.accent; c.beginPath(); c.arc(bx, h * 0.5, 5.2, 0, Math.PI * 2); c.fill();
-            renderStyledCraft(c, { x: smashX, y: h * 0.5, radius: 13.5, color: th.p1, shape, visualStyle, angle: 0, time: heroFxTime, isDashing: true });
-            renderStyledCraft(c, { x: w - 22, y: h * 0.3, radius: 9.5, color: th.p2, shape, visualStyle, angle: Math.PI, time: heroFxTime });
-          }
-        } else if (gId === 'sumo') {
-          c.strokeStyle = rgba(th.line, 0.55); c.lineWidth = 2;
-          c.beginPath(); c.arc(w * 0.5, h * 0.5, 22, 0, Math.PI * 2); c.stroke();
-
-          if (phase === 0) {
-            // Phase 1: Collecting golden energy orb & growing
-            const orbVisible = phaseT < 0.55;
-            if (orbVisible) {
-              c.fillStyle = '#ffbe0b'; c.beginPath(); c.arc(w * 0.5, h * 0.5, 4.5, 0, Math.PI * 2); c.fill();
-            }
-            const r1 = orbVisible ? 8.5 : 11.5;
-            renderStyledCraft(c, { x: w * 0.5 - 22 + phaseT * 18, y: h * 0.5, radius: r1, color: th.p1, shape, visualStyle, angle: 0, time: heroFxTime });
-            renderStyledCraft(c, { x: w * 0.5 + 22, y: h * 0.5, radius: 9, color: th.p2, shape, visualStyle, angle: Math.PI, time: heroFxTime });
-          } else if (phase === 1) {
-            // Phase 2: Golden SHOCK wave ring blast!
-            const waveR = 8 + phaseT * 36;
-            c.strokeStyle = rgba('#ffbe0b', 1 - phaseT); c.lineWidth = 2.5;
-            c.beginPath(); c.arc(w * 0.42, h * 0.5, safeR(waveR), 0, Math.PI * 2); c.stroke();
-            renderStyledCraft(c, { x: w * 0.42, y: h * 0.5, radius: 10.5, color: th.p1, shape, visualStyle, angle: 0, time: heroFxTime, isDashing: true });
-            renderStyledCraft(c, { x: w * 0.54 + phaseT * 24, y: h * 0.5, radius: 9.5, color: th.p2, shape, visualStyle, angle: Math.PI, time: heroFxTime });
-          } else {
-            // Phase 3: Heavy center collision knock-out
-            const p1x = w * 0.34 + phaseT * 28;
-            const p2x = w * 0.52 + phaseT * 46;
-            renderStyledCraft(c, { x: p1x, y: h * 0.5, radius: 11, color: th.p1, shape, visualStyle, angle: 0, time: heroFxTime });
-            renderStyledCraft(c, { x: p2x, y: h * 0.5, radius: 9, color: th.p2, shape, visualStyle, angle: Math.PI, time: heroFxTime });
-          }
-        } else if (gId === 'tron') {
-          if (phase === 0) {
-            // Phase 1: Parallel neon ribbon weaving
-            const x1 = 30 + phaseT * (w - 60);
-            const y1 = h * 0.35 + Math.sin(phaseT * 10) * 6;
-            const y2 = h * 0.65 - Math.sin(phaseT * 10) * 6;
-            c.strokeStyle = th.p1; c.lineWidth = 3; c.beginPath(); c.moveTo(20, h * 0.35); c.lineTo(x1, y1); c.stroke();
-            c.strokeStyle = th.p2; c.lineWidth = 3; c.beginPath(); c.moveTo(20, h * 0.65); c.lineTo(x1, y2); c.stroke();
-            renderStyledCraft(c, { x: x1, y: y1, radius: 6.5, color: th.p1, shape, visualStyle, angle: 0, time: heroFxTime });
-            renderStyledCraft(c, { x: x1, y: y2, radius: 6.5, color: th.p2, shape, visualStyle, angle: 0, time: heroFxTime });
-          } else if (phase === 1) {
-            // Phase 2: Tight 360° spiral orbit
-            const ang = phaseT * Math.PI * 2;
-            const cx = w * 0.5, cy = h * 0.5;
-            c.strokeStyle = th.p1; c.lineWidth = 2.5; c.beginPath(); c.arc(cx, cy, 15, 0, ang); c.stroke();
-            renderStyledCraft(c, { x: cx + Math.cos(ang) * 15, y: cy + Math.sin(ang) * 15, radius: 6.5, color: th.p1, shape, visualStyle, angle: ang + Math.PI / 2, time: heroFxTime });
-            renderStyledCraft(c, { x: cx - Math.cos(ang) * 26, y: cy - Math.sin(ang) * 12, radius: 6.5, color: th.p2, shape, visualStyle, angle: ang - Math.PI / 2, time: heroFxTime });
-          } else {
-            // Phase 3: Sharp overtake cut-off
-            const x1 = 24 + phaseT * (w - 48);
-            const y1 = h * 0.5 + Math.cos(phaseT * Math.PI) * 13;
-            c.strokeStyle = th.p1; c.lineWidth = 3; c.beginPath(); c.moveTo(24, h * 0.72); c.quadraticCurveTo(w * 0.5, h * 0.2, x1, y1); c.stroke();
-            renderStyledCraft(c, { x: x1, y: y1, radius: 7, color: th.p1, shape, visualStyle, angle: 0, time: heroFxTime });
-            renderStyledCraft(c, { x: Math.max(20, x1 - 32), y: h * 0.5, radius: 6.5, color: th.p2, shape, visualStyle, angle: 0, time: heroFxTime });
-          }
-        } else if (gId === 'pong') {
-          const p1y = h * 0.5 + Math.sin(heroFxTime * 4) * 12;
-          const p2y = h * 0.5 - Math.sin(heroFxTime * 4) * 12;
-          c.fillStyle = th.p1; c.fillRect(16, p1y - 11, 5, 22);
-          c.fillStyle = th.p2; c.fillRect(w - 21, p2y - 11, 5, 22);
-
-          if (phase === 0) {
-            // Phase 1: Straight high-speed rally
-            const bx = 26 + Math.abs(Math.sin(phaseT * Math.PI * 2)) * (w - 52);
-            c.fillStyle = '#ffffff'; c.beginPath(); c.arc(bx, h * 0.5, 4.5, 0, Math.PI * 2); c.fill();
-          } else if (phase === 1) {
-            // Phase 2: Wide S-curve spin shot!
-            const bx = 26 + phaseT * (w - 52);
-            const by = h * 0.5 + Math.sin(phaseT * Math.PI * 2) * 16;
-            c.strokeStyle = rgba(th.accent, 0.55); c.lineWidth = 2.5;
-            c.beginPath(); c.moveTo(26, h * 0.5); c.quadraticCurveTo(w * 0.5, h * 0.1, bx, by); c.stroke();
-            c.fillStyle = th.accent; c.beginPath(); c.arc(bx, by, 5, 0, Math.PI * 2); c.fill();
-          } else {
-            // Phase 3: Overdrive plasma smash
-            const bx = w - 26 - phaseT * (w - 52);
-            c.fillStyle = '#ffbe0b'; c.shadowColor = '#ffbe0b'; c.shadowBlur = 10;
-            c.beginPath(); c.arc(bx, h * 0.5, 5.5, 0, Math.PI * 2); c.fill();
-          }
-        } else {
-          // Paint War: 3 phases (Sweeping trails -> Paint Bomb explosion -> Territory clash)
-          if (phase === 0) {
-            const x1 = 36 + phaseT * (w * 0.35);
-            const x2 = w - 36 - phaseT * (w * 0.35);
-            c.fillStyle = rgba(th.p1, 0.38); c.fillRect(0, 0, x1 + 14, h);
-            c.fillStyle = rgba(th.p2, 0.38); c.fillRect(x2 - 14, 0, w - x2 + 14, h);
-            renderStyledCraft(c, { x: x1, y: h * 0.5, radius: 9.5, color: th.p1, shape, visualStyle, angle: 0, time: heroFxTime });
-            renderStyledCraft(c, { x: x2, y: h * 0.5, radius: 9.5, color: th.p2, shape, visualStyle, angle: Math.PI, time: heroFxTime });
-          } else if (phase === 1) {
-            // Phase 2: Paint Bomb radial splash!
-            const splashR = 10 + phaseT * 48;
-            c.fillStyle = rgba(th.p1, 0.36); c.beginPath(); c.arc(w * 0.5, h * 0.5, safeR(splashR), 0, Math.PI * 2); c.fill();
-            c.strokeStyle = th.accent; c.lineWidth = 2; c.beginPath(); c.arc(w * 0.5, h * 0.5, safeR(splashR), 0, Math.PI * 2); c.stroke();
-            renderStyledCraft(c, { x: w * 0.5, y: h * 0.5, radius: 10, color: th.p1, shape, visualStyle, angle: heroFxTime * 3, time: heroFxTime });
-          } else {
-            // Phase 3: Mid-arena tug of war
-            const splitX = w * (0.5 + Math.sin(phaseT * Math.PI * 2) * 0.16);
-            c.fillStyle = rgba(th.p1, 0.38); c.fillRect(0, 0, splitX, h);
-            c.fillStyle = rgba(th.p2, 0.38); c.fillRect(splitX, 0, w - splitX, h);
-            renderStyledCraft(c, { x: splitX - 14, y: h * 0.42, radius: 9, color: th.p1, shape, visualStyle, angle: 0, time: heroFxTime });
-            renderStyledCraft(c, { x: splitX + 14, y: h * 0.58, radius: 9, color: th.p2, shape, visualStyle, angle: Math.PI, time: heroFxTime });
-          }
-        }
-
-        // Small phase indicator dots in bottom-right of hero canvas
-        for (let d = 0; d < 3; d++) {
-          c.fillStyle = d === phase ? '#ffffff' : 'rgba(255,255,255,0.3)';
-          c.beginPath();
-          c.arc(w - 26 + d * 8, h - 7, d === phase ? 2.2 : 1.5, 0, Math.PI * 2);
-          c.fill();
-        }
-
-        renderVisualPostOverlay(c, w, h, visualStyle);
-        c.restore();
-      }
-
-      /* =========================================================================
-       * GAMEPLAY ENGINE LAUNCH, PAUSE & HUD
-       * ========================================================================= */
-      function resizeCanvas() {
-        const rect = gameCanvas.getBoundingClientRect();
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        viewW = Math.max(280, rect.width || window.innerWidth);
-        viewH = Math.max(400, rect.height || window.innerHeight);
-        gameCanvas.width = Math.round(viewW * dpr);
-        gameCanvas.height = Math.round(viewH * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        if (joystickCtrl.enabled) joystickCtrl.layout(viewW, viewH);
-      }
-      window.addEventListener('resize', () => { if (!gameView.classList.contains('hidden')) resizeCanvas(); });
-
-      function createGameEngine(gameId) {
-        const s = userGameSettings[gameId];
-        switch (gameId) {
-          case 'airhockey': return new AirHockeyGame(s, vfx);
-          case 'sumo': return new SumoGame(s, vfx);
-          case 'tron': return new TronGame(s, vfx);
-          case 'pong': return new SpinPongGame(s, vfx);
-          case 'paint': return new PaintWarGame(s, vfx);
-          default: return new AirHockeyGame(s, vfx);
-        }
-      }
-
-      function startMatch(gameId) {
-        selectedGameId = gameId;
-        sound.unlock(); sound.playSelect();
-
-        menuView.classList.add('hidden');
-        gameView.classList.remove('hidden');
-        gameView.classList.add('flex');
-        resultModal.classList.add('hidden');
-        resultModal.classList.remove('flex');
-        pauseModal.classList.add('hidden');
-        pauseModal.classList.remove('flex');
-        document.body.classList.add('in-game');
-
-        resizeCanvas();
-        vfx.clear();
-
-        const gameMeta = GAMES_CATALOG.find(g => g.id === gameId);
-        const s = userGameSettings[gameId];
-        const th = getActiveTheme(gameId);
-        const isBot = playMode === 'bot';
-
-        // Style In-Game Menu Button dynamically with active Arena Theme colors!
-        inGameMenuBtn.style.background = rgba(th.bg, 0.88);
-        inGameMenuBtn.style.borderColor = th.line;
-        inGameMenuBtn.style.color = '#ffffff';
-        inGameMenuBtn.style.boxShadow = `0 0 14px ${rgba(th.line, 0.45)}`;
-        const menuIcon = document.getElementById('inGameMenuIcon');
-        if (menuIcon) menuIcon.style.color = th.line;
-
-        directTouch.configure(!gameMeta.isJoystick, gameId === 'paint', isBot, viewW, viewH);
-        joystickCtrl.configure(
-          gameMeta.isJoystick, s.joystickType || 'fixed', gameId === 'sumo', isBot, viewW, viewH,
-          (playerNum) => {
-            if (activeGameEngine && gameId === 'sumo' && gameState === 'playing') {
-              activeGameEngine.triggerShock(playerNum, joystickCtrl);
-            }
-          }
-        );
-        joystickCtrl.setColors(th.p1, th.p2);
-
-        activeGameEngine = createGameEngine(gameId);
-        activeGameEngine.init(viewW, viewH, gameMeta.isJoystick ? joystickCtrl : directTouch);
-
-        gameState = 'countdown';
-        countdownTimer = 2.4;
-        lastFrameTime = performance.now();
-        sound.playCountdown(false);
-
-        if (rafId) cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(gameLoop);
-      }
-
-      function openPauseMenu() {
-        if (gameState === 'gameover' || gameState === 'menu') return;
+      });
+      document.getElementById('doneSettingsBtn').addEventListener('click', () => {
         sound.playSelect();
-        directTouch.clearTouches();
-        joystickCtrl.clearTouches();
-        gameState = 'paused';
-        const game = GAMES_CATALOG.find(g => g.id === selectedGameId) || GAMES_CATALOG[0];
-        pauseGameTitle.textContent = t(game.titleKey);
-        syncSoundUI();
-        renderSettingsForGame(selectedGameId, pauseGameSettingsContainer, false);
-        pauseModal.classList.remove('hidden');
-        pauseModal.classList.add('flex');
-      }
-
-      function resumeFromPause() {
-        sound.playSelect();
-        pauseModal.classList.add('hidden');
-        pauseModal.classList.remove('flex');
-        const gameMeta = GAMES_CATALOG.find(g => g.id === selectedGameId);
-        const s = userGameSettings[selectedGameId];
-        const th = getActiveTheme(selectedGameId);
-
-        inGameMenuBtn.style.background = rgba(th.bg, 0.88);
-        inGameMenuBtn.style.borderColor = th.line;
-        inGameMenuBtn.style.boxShadow = `0 0 14px ${rgba(th.line, 0.45)}`;
-        const menuIcon = document.getElementById('inGameMenuIcon');
-        if (menuIcon) menuIcon.style.color = th.line;
-
-        if (gameMeta.isJoystick) {
-          joystickCtrl.mode = s.joystickType || 'fixed';
-          joystickCtrl.setColors(th.p1, th.p2);
-          joystickCtrl.layout(viewW, viewH);
+        settingsModal.classList.add('hidden');
+        settingsModal.classList.remove('flex');
+      });
+      settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) {
+          settingsModal.classList.add('hidden');
+          settingsModal.classList.remove('flex');
         }
-        gameState = 'playing';
-        lastFrameTime = performance.now();
-      }
+      });
 
-      function exitToMainMenu() {
-        sound.playSelect();
-        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-        directTouch.enabled = false; directTouch.clearTouches();
-        joystickCtrl.enabled = false; joystickCtrl.clearTouches();
-        activeGameEngine = null;
-        gameState = 'menu';
-        document.body.classList.remove('in-game');
-        pauseModal.classList.add('hidden'); pauseModal.classList.remove('flex');
-        resultModal.classList.add('hidden'); resultModal.classList.remove('flex');
-        gameView.classList.add('hidden'); gameView.classList.remove('flex');
-        menuView.classList.remove('hidden');
-        renderSelectedGameSummary();
-        updateStartButtonUI();
-      }
+      document.getElementById('soundOnBtn').addEventListener('click', () => { sound.enabled = true; sound.unlock(); sound.playSelect(); syncSoundUI(); });
+      document.getElementById('soundOffBtn').addEventListener('click', () => { sound.enabled = false; syncSoundUI(); });
+      document.getElementById('volumeSlider').addEventListener('input', (e) => { sound.volume = clamp(Number(e.target.value) / 100, 0, 1); syncSoundUI(); });
 
-      function handleRoundScored(scorer) {
-        if (!activeGameEngine) return;
-        const target = activeGameEngine.winScore || 5;
-        if (activeGameEngine.p1Score >= target) { endMatch(1); return; }
-        if (activeGameEngine.p2Score >= target) { endMatch(2); return; }
-        gameState = 'round_pause';
-        roundPauseTimer = 0.95;
-        activeGameEngine._nextScorer = scorer;
-      }
+      document.getElementById('pauseSoundOnBtn').addEventListener('click', () => { sound.enabled = true; sound.unlock(); sound.playSelect(); syncSoundUI(); });
+      document.getElementById('pauseSoundOffBtn').addEventListener('click', () => { sound.enabled = false; syncSoundUI(); });
+      document.getElementById('pauseVolumeSlider').addEventListener('input', (e) => { sound.volume = clamp(Number(e.target.value) / 100, 0, 1); syncSoundUI(); });
 
-      function endMatch(winner) {
-        gameState = 'gameover';
-        directTouch.enabled = false; joystickCtrl.enabled = false;
-        let summaryText = `${t('scoreLabel')}: ${activeGameEngine.p1Score} - ${activeGameEngine.p2Score}`;
-        if (selectedGameId === 'paint') {
-          summaryText = `${t('areaLabel')}: %${activeGameEngine.p1Percent} - %${activeGameEngine.p2Percent}`;
-          if (activeGameEngine.p1Percent > activeGameEngine.p2Percent) winner = 1;
-          else if (activeGameEngine.p2Percent > activeGameEngine.p1Percent) winner = 2;
-          else winner = 0;
-        }
-        const p2WinStr = playMode === 'bot' ? t('botWins') : t('p2Wins');
-        if (winner === 1) {
-          modalTitleP1.textContent = t('p1Wins'); modalTitleP1.className = 'font-display text-2xl font-black text-[#0284c7] mt-1';
-          modalTitleP2.textContent = t('p1Wins'); modalTitleP2.className = 'font-display text-xl font-black text-[#0284c7] mt-0.5';
-        } else if (winner === 2) {
-          modalTitleP1.textContent = p2WinStr; modalTitleP1.className = 'font-display text-2xl font-black text-[#e11d48] mt-1';
-          modalTitleP2.textContent = p2WinStr; modalTitleP2.className = 'font-display text-xl font-black text-[#e11d48] mt-0.5';
-        } else {
-          modalTitleP1.textContent = t('draw'); modalTitleP1.className = 'font-display text-2xl font-black text-[#f59e0b] mt-1';
-          modalTitleP2.textContent = t('draw'); modalTitleP2.className = 'font-display text-xl font-black text-[#f59e0b] mt-0.5';
-        }
-        modalTopBanner.style.display = playMode === 'bot' ? 'none' : 'block';
-        modalScoreSummary.textContent = summaryText;
-        resultModal.classList.remove('hidden'); resultModal.classList.add('flex');
-      }
+      document.getElementById('startBtn').addEventListener('click', () => startGame(selectedGameId));
+      document.getElementById('inGameMenuBtn').addEventListener('click', () => { sound.playSelect(); pauseGame(); });
+      document.getElementById('resumeTopBtn').addEventListener('click', () => { sound.playSelect(); resumeGame(); });
+      document.getElementById('resumeBtn').addEventListener('click', () => { sound.playSelect(); resumeGame(); });
+      document.getElementById('pauseRestartBtn').addEventListener('click', () => startGame(selectedGameId));
+      document.getElementById('pauseExitBtn').addEventListener('click', () => returnToMenu());
 
-      function gameLoop(now) {
-        const dt = clamp((now - lastFrameTime) / 1000, 0.001, 0.05);
-        lastFrameTime = now;
-        if (!activeGameEngine) return;
+      document.getElementById('replayBtn').addEventListener('click', () => startGame(selectedGameId));
+      document.getElementById('backToMenuBtn').addEventListener('click', () => returnToMenu());
 
-        if (gameState !== 'paused') {
-          vfx.update(dt);
-          if (directTouch.enabled) directTouch.step(dt);
-          if (joystickCtrl.enabled) joystickCtrl.step(dt);
-
-          if (gameState === 'countdown') {
-            const prevInt = Math.ceil(countdownTimer);
-            countdownTimer -= dt;
-            const nextInt = Math.ceil(countdownTimer);
-            if (nextInt !== prevInt && nextInt > 0) sound.playCountdown(false);
-            if (countdownTimer <= 0) {
-              sound.playCountdown(true);
-              gameState = 'playing';
-              if (selectedGameId === 'airhockey' && activeGameEngine.pucks[0]) {
-                const dir = Math.random() < 0.5 ? 1 : -1;
-                const ang = (Math.random() * 0.6 - 0.3) + (dir > 0 ? Math.PI / 2 : -Math.PI / 2);
-                const spd = 330 * activeGameEngine.speedMult;
-                activeGameEngine.pucks[0].vx = Math.cos(ang) * spd;
-                activeGameEngine.pucks[0].vy = Math.sin(ang) * spd;
-              }
-            }
-          } else if (gameState === 'playing') {
-            botAI.update(dt, selectedGameId, activeGameEngine, viewW, viewH, directTouch, joystickCtrl);
-            if (selectedGameId === 'airhockey') activeGameEngine.update(dt, viewW, viewH, directTouch, handleRoundScored);
-            else if (selectedGameId === 'sumo') activeGameEngine.update(dt, viewW, viewH, joystickCtrl, handleRoundScored);
-            else if (selectedGameId === 'tron') activeGameEngine.update(dt, viewW, viewH, joystickCtrl, handleRoundScored);
-            else if (selectedGameId === 'pong') activeGameEngine.update(dt, viewW, viewH, directTouch, handleRoundScored);
-            else if (selectedGameId === 'paint') activeGameEngine.update(dt, viewW, viewH, directTouch, () => endMatch(0));
-          } else if (gameState === 'round_pause') {
-            roundPauseTimer -= dt;
-            if (roundPauseTimer <= 0) {
-              activeGameEngine.resetRound(viewW, viewH, activeGameEngine._nextScorer || 1);
-              gameState = 'playing';
-            }
-          }
-        }
-
-        ctx.save();
-        vfx.applyShake(ctx);
-        activeGameEngine.render(ctx, viewW, viewH);
-        renderScoreHUD(ctx, viewW, viewH);
-        vfx.render(ctx, viewW, viewH);
-        if (joystickCtrl.enabled) joystickCtrl.render(ctx);
-
-        if (gameState === 'countdown') {
-          const num = Math.max(1, Math.ceil(countdownTimer));
-          ctx.save();
-          ctx.fillStyle = 'rgba(7, 9, 15, 0.45)';
-          ctx.fillRect(0, 0, viewW, viewH);
-          ctx.font = '900 58px Orbitron, sans-serif';
-          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillStyle = '#00f0ff'; ctx.shadowColor = '#00f0ff'; ctx.shadowBlur = 24;
-          ctx.fillText(String(num), viewW * 0.5, playMode === 'bot' ? viewH * 0.5 : viewH * 0.5 + 48);
-          if (playMode !== 'bot') {
-            ctx.save();
-            ctx.translate(viewW * 0.5, viewH * 0.5 - 48);
-            ctx.rotate(Math.PI);
-            ctx.fillStyle = '#ff2a85'; ctx.shadowColor = '#ff2a85';
-            ctx.fillText(String(num), 0, 0);
-            ctx.restore();
-          }
-          ctx.restore();
-        }
-        ctx.restore();
-        rafId = requestAnimationFrame(gameLoop);
-      }
-
-      function renderScoreHUD(ctx, w, h) {
-        if (!activeGameEngine) return;
-        const theme = getActiveTheme(selectedGameId);
-        let leftVal = String(activeGameEngine.p1Score || 0);
-        let rightVal = String(activeGameEngine.p2Score || 0);
-        if (selectedGameId === 'paint') {
-          leftVal = `%${activeGameEngine.p1Percent}`;
-          rightVal = `%${activeGameEngine.p2Percent}`;
-        }
-
-        ctx.save();
-        ctx.translate(w - 34, h * 0.5);
-        ctx.fillStyle = 'rgba(7, 9, 15, 0.80)';
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.roundRect(-24, -48, 48, 96, 14); ctx.fill(); ctx.stroke();
-
-        ctx.font = '900 13px Orbitron, sans-serif';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillStyle = theme.p2; ctx.fillText(rightVal, 0, -24);
-        ctx.fillStyle = theme.p1; ctx.fillText(leftVal, 0, 24);
-
-        if (selectedGameId === 'paint') {
-          const secs = Math.ceil(activeGameEngine.timeLeft);
-          ctx.font = '800 10px Orbitron, sans-serif';
-          ctx.fillStyle = secs <= 5 ? '#ffbe0b' : '#ffffff';
-          ctx.fillText(`${secs}s`, 0, 0);
-        } else {
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
-          ctx.beginPath(); ctx.moveTo(-14, 0); ctx.lineTo(14, 0); ctx.stroke();
-        }
-        ctx.restore();
-      }
-
-      startBtn.addEventListener('click', () => startMatch(selectedGameId));
-      inGameMenuBtn.addEventListener('click', openPauseMenu);
-      resumeTopBtn.addEventListener('click', resumeFromPause);
-      resumeBtn.addEventListener('click', resumeFromPause);
-      pauseRestartBtn.addEventListener('click', () => startMatch(selectedGameId));
-      pauseExitBtn.addEventListener('click', exitToMainMenu);
-      replayBtn.addEventListener('click', () => startMatch(selectedGameId));
-      backToMenuBtn.addEventListener('click', exitToMainMenu);
-
-      // Initial Boot with Bright Sky-Blue & White-Shadow Theme
+      // Initial startup: Sky Blue & White theme + Hero Multi-Stage Preview + Clean Menu
       applyAppTheme('sky_white');
-      applyLanguageUI();
-      syncSoundUI();
-      startHeroFxLoop();
+      renderAllUI();
+      startHeroPreviewAnimation();
     })();
   </script>
 </body>
